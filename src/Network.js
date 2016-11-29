@@ -108,17 +108,17 @@ export default class Network extends Viz {
       n.y = y(n.fy);
     });
 
-    const rExtent = extent(nodes.map(n => n.r)),
-          rMax = this._sizeMax || min(
-            merge(nodes
-              .map(n1 => nodes
-                .map(n2 => n1 === n2 ? null : shapes.pointDistance(n1, n2))
-              )
+    const rExtent = extent(nodes.map(n => n.r));
+    let rMax = this._sizeMax || min(
+          merge(nodes
+            .map(n1 => nodes
+              .map(n2 => n1 === n2 ? null : shapes.pointDistance(n1, n2))
             )
-          ) / 2;
+          )
+        ) / 2;
 
     const r = scales[`scale${this._sizeScale.charAt(0).toUpperCase()}${this._sizeScale.slice(1)}`]()
-                .domain(rExtent).range([this._sizeMin, rMax]),
+                .domain(rExtent).range([rExtent[0] === rExtent[1] ? rMax : this._sizeMin, rMax]),
           xDomain = x.domain(),
           yDomain = y.domain();
 
@@ -136,7 +136,8 @@ export default class Network extends Viz {
     const xNewSize = xDomain[1] - xDomain[0],
           yNewSize = yDomain[1] - yDomain[0];
 
-    r.range([this._sizeMin, rMax * min([xOldSize / xNewSize, yOldSize / yNewSize])]);
+    rMax *= min([xOldSize / xNewSize, yOldSize / yNewSize]);
+    r.range([rExtent[0] === rExtent[1] ? rMax : this._sizeMin, rMax]);
     x.domain(xDomain);
     y.domain(yDomain);
 
@@ -163,12 +164,12 @@ export default class Network extends Viz {
       .config(this._shapeConfigPrep("Path"))
       .d(d => `M${d.source.x},${d.source.y} ${d.target.x},${d.target.y}`)
       .data(links)
-      .duration(0)
+      // .duration(0)
       .select(elem("g.d3plus-network-links", {parent, transition, enter: {transform}, update: {transform}}).node())
       .render());
 
     const shapeConfig = {
-      duration: 0,
+      // duration: 0,
       label: d => this._drawLabel(d.data || d.node, d.i),
       select: elem("g.d3plus-network-nodes", {parent, transition, enter: {transform}, update: {transform}}).node(),
       x: d => d.x,
