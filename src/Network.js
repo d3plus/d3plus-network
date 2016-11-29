@@ -1,7 +1,7 @@
 import {extent, mean, min, merge} from "d3-array";
 import {nest} from "d3-collection";
 // import {forceSimulation} from "d3-force";
-import {scaleLinear} from "d3-scale";
+import * as scales from "d3-scale";
 
 import {assign as colorAssign} from "d3plus-color";
 import {accessor, assign, constant, elem} from "d3plus-common";
@@ -26,6 +26,7 @@ export default class Network extends Viz {
     this._links = [];
     this._nodes = [];
     this._sizeMin = 5;
+    this._sizeScale = "sqrt";
     this._shape = constant("Circle");
     this._shapeConfig = assign(this._shapeConfig, {
       Path: {
@@ -87,8 +88,8 @@ export default class Network extends Viz {
     const xExtent = extent(nodes.map(n => n.fx)),
           yExtent = extent(nodes.map(n => n.fy));
 
-    const x = scaleLinear().domain(xExtent).range([0, width]),
-          y = scaleLinear().domain(yExtent).range([0, height]);
+    const x = scales.scaleLinear().domain(xExtent).range([0, width]),
+          y = scales.scaleLinear().domain(yExtent).range([0, height]);
 
     const nodeRatio = (xExtent[1] - xExtent[0]) / (yExtent[1] - yExtent[0]),
           screenRatio = width / height;
@@ -116,7 +117,8 @@ export default class Network extends Viz {
             )
           ) / 2;
 
-    const r = scaleLinear().domain(rExtent).range([this._sizeMin, rMax]),
+    const r = scales[`scale${this._sizeScale.charAt(0).toUpperCase()}${this._sizeScale.slice(1)}`]()
+                .domain(rExtent).range([this._sizeMin, rMax]),
           xDomain = x.domain(),
           yDomain = y.domain();
 
@@ -251,6 +253,33 @@ export default class Network extends Viz {
     return arguments.length
          ? (this._size = typeof _ === "function" || !_ ? _ : accessor(_), this)
          : this._size;
+  }
+
+  /**
+      @memberof Network
+      @desc If *value* is specified, sets the size scale maximum to the specified number and returns the current class instance. If *value* is not specified, returns the current size scale maximum. By default, the maximum size is determined by half the distance of the two closest nodes.
+      @param {Number} [*value*]
+  */
+  sizeMax(_) {
+    return arguments.length ? (this._sizeMax = _, this) : this._sizeMax;
+  }
+
+  /**
+      @memberof Network
+      @desc If *value* is specified, sets the size scale minimum to the specified number and returns the current class instance. If *value* is not specified, returns the current size scale minimum.
+      @param {Number} [*value* = 5]
+  */
+  sizeMin(_) {
+    return arguments.length ? (this._sizeMin = _, this) : this._sizeMin;
+  }
+
+  /**
+      @memberof Network
+      @desc If *value* is specified, sets the size scale to the specified string and returns the current class instance. If *value* is not specified, returns the current size scale.
+      @param {String} [*value* = "sqrt"]
+  */
+  sizeScale(_) {
+    return arguments.length ? (this._sizeScale = _, this) : this._sizeScale;
   }
 
   /**
