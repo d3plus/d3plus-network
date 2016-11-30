@@ -30,10 +30,10 @@ export default class Network extends Viz {
     this._shape = constant("Circle");
     this._shapeConfig = assign(this._shapeConfig, {
       Path: {
-        fill: constant("none"),
+        fill: "none",
         label: false,
-        stroke: (d, i) => colorAssign(this._id(d, i)),
-        strokeWidth: constant(1)
+        stroke: "#eee",
+        strokeWidth: 1
       },
       textAnchor: "middle",
       verticalAlign: "middle"
@@ -151,17 +151,27 @@ export default class Network extends Viz {
       n.height = n.r * 2;
     });
 
+    const nodeLookup = nodes.reduce((obj, d) => {
+      obj[d.id] = d;
+      return obj;
+    }, {});
+
     // forceSimulation(nodes)
     //   .on("tick", () => this._shapes.forEach(s => s.render()));
 
     const nodeIndices = nodes.map(n => n.node);
     const links = this._links.map(l => ({
-      source: typeof l.source === "number" ? nodes[nodeIndices.indexOf(this._nodes[l.source])] : l.source,
-      target: typeof l.target === "number" ? nodes[nodeIndices.indexOf(this._nodes[l.target])] : l.target
+      source: typeof l.source === "number"
+            ? nodes[nodeIndices.indexOf(this._nodes[l.source])]
+            : nodeLookup[l.source.id],
+      target: typeof l.target === "number"
+            ? nodes[nodeIndices.indexOf(this._nodes[l.target])]
+            : nodeLookup[l.target.id]
     }));
 
     this._shapes.push(new shapes.Path()
-      .config(this._shapeConfigPrep("Path"))
+      .config(this._shapeConfig)
+      .config(this._shapeConfig.Path)
       .d(d => `M${d.source.x},${d.source.y} ${d.target.x},${d.target.y}`)
       .data(links)
       // .duration(0)
@@ -171,9 +181,7 @@ export default class Network extends Viz {
     const shapeConfig = {
       // duration: 0,
       label: d => this._drawLabel(d.data || d.node, d.i),
-      select: elem("g.d3plus-network-nodes", {parent, transition, enter: {transform}, update: {transform}}).node(),
-      x: d => d.x,
-      y: d => d.y
+      select: elem("g.d3plus-network-nodes", {parent, transition, enter: {transform}, update: {transform}}).node()
     };
 
     nest().key(d => d.shape).entries(nodes).forEach(d => {
