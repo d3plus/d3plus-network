@@ -189,4 +189,4 @@ If *value* is specified, sets the y accessor to the specified function or string
 
 
 
-###### <sub>Documentation generated on Tue, 29 Nov 2016 19:48:42 GMT</sub>
+###### <sub>Documentation generated on Thu, 01 Dec 2016 16:49:18 GMT</sub>
