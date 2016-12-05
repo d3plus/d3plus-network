@@ -117,7 +117,7 @@ export default class Network extends Viz {
         ) / 2;
 
     const r = scales[`scale${this._sizeScale.charAt(0).toUpperCase()}${this._sizeScale.slice(1)}`]()
-                .domain(rExtent).range([rExtent[0] === rExtent[1] ? rMax : this._sizeMin, rMax]),
+                .domain(rExtent).range([rExtent[0] === rExtent[1] ? rMax : min([rMax / 2, this._sizeMin]), rMax]),
           xDomain = x.domain(),
           yDomain = y.domain();
 
@@ -136,7 +136,7 @@ export default class Network extends Viz {
           yNewSize = yDomain[1] - yDomain[0];
 
     rMax *= min([xOldSize / xNewSize, yOldSize / yNewSize]);
-    r.range([rExtent[0] === rExtent[1] ? rMax : this._sizeMin, rMax]);
+    r.range([rExtent[0] === rExtent[1] ? rMax : min([rMax / 2, this._sizeMin]), rMax]);
     x.domain(xDomain);
     y.domain(yDomain);
 
