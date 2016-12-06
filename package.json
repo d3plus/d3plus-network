@@ -27,7 +27,7 @@
     "d3-force": "^1.0.4",
     "d3-scale": "^1.0.4",
     "d3plus-common": "^0.6.9",
-    "d3plus-shape": "^0.10.8",
+    "d3plus-shape": "^0.10.9",
     "d3plus-viz": "^0.4.11"
   },
   "scripts": {
