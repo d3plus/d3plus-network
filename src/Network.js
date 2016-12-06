@@ -1,4 +1,4 @@
-import {extent, max, mean, min, merge} from "d3-array";
+import {extent, mean, min, merge} from "d3-array";
 import {brush} from "d3-brush";
 import {nest} from "d3-collection";
 // import {forceSimulation} from "d3-force";
