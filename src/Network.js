@@ -1,7 +1,9 @@
 import {extent, mean, min, merge} from "d3-array";
 import {nest} from "d3-collection";
 // import {forceSimulation} from "d3-force";
+import {event} from "d3-selection";
 import * as scales from "d3-scale";
+import {zoom} from "d3-zoom";
 
 import {accessor, assign, constant, elem} from "d3plus-common";
 import * as shapes from "d3plus-shape";
@@ -40,6 +42,54 @@ export default class Network extends Viz {
     this._x = accessor("x");
     this._y = accessor("y");
 
+    this._zoom = true;
+    this._zoomBehavior = zoom();
+    this._zoomBrush = false;
+    this._zoomMax = 16;
+    this._zoomPan = true;
+    this._zoomScroll = true;
+
+  }
+
+  /**
+      Handles events dispatched from this._zoomBehavior
+      @private
+  */
+  _zoomed() {
+    this._zoomGroup.attr("transform", event.transform);
+  }
+
+  /**
+      Handles adding/removing zoom event listeners.
+      @private
+  */
+  _zoomEvents() {
+
+    if (this._zoomBrush) {
+      // brushGroup.style("display", "inline");
+      this._networkGroup.on(".zoom", null);
+    }
+    else if (this._zoom) {
+      // brushGroup.style("display", "none");
+      this._networkGroup.call(this._zoomBehavior);
+      if (!this._zoomScroll) {
+        this._networkGroup
+          .on("mousewheel.zoom", null)
+          .on("MozMousePixelScroll.zoom", null)
+          .on("wheel.zoom", null);
+      }
+      if (!this._zoomPan) {
+        this._networkGroup
+          .on("mousedown.zoom", null)
+          .on("mousemove.zoom", null)
+          .on("touchstart.zoom", null)
+          .on("touchmove.zoom", null);
+      }
+    }
+    else {
+      this._networkGroup.on(".zoom", null);
+    }
+
   }
 
   /**
@@ -51,7 +101,6 @@ export default class Network extends Viz {
     super.render(callback);
 
     const height = this._height - this._margin.top - this._margin.bottom,
-          parent = this._select,
           transform = `translate(${this._margin.left}, ${this._margin.top})`,
           transition = this._transition,
           width = this._width - this._margin.left - this._margin.right;
@@ -168,6 +217,71 @@ export default class Network extends Viz {
             : nodeLookup[l.target.id]
     }));
 
+    this._networkGroup = this._select.selectAll("svg.d3plus-network-svg").data([0]);
+
+    this._networkGroup = this._networkGroup.enter().append("svg")
+        .attr("class", "d3plus-network-svg")
+        .attr("opacity", 0)
+        .attr("width", width)
+        .attr("height", height)
+        .style("background-color", "transparent")
+      .merge(this._networkGroup);
+
+    this._networkGroup.transition(this._transition)
+      .attr("opacity", 1)
+      .attr("width", width)
+      .attr("height", height);
+
+    const hitArea = this._networkGroup.selectAll("rect.d3plus-network-hitArea").data([0]);
+    hitArea.enter().append("rect")
+        .attr("class", "d3plus-network-hitArea")
+      .merge(hitArea)
+        .attr("width", width)
+        .attr("height", height)
+        .attr("fill", "transparent");
+
+    this._zoomGroup = this._networkGroup.selectAll("g.d3plus-network-zoomGroup").data([0]);
+    this._zoomGroup = this._zoomGroup.enter().append("g")
+        .attr("class", "d3plus-network-zoomGroup")
+      .merge(this._zoomGroup);
+
+    // TODO: Brush to Zoom
+    // const brushGroup = this._select.selectAll("g.brush").data([0]);
+    // brushGroup.enter().append("g").attr("class", "brush");
+    //
+    // var xBrush = d3.scale.identity().domain([0, width]),
+    //     yBrush = d3.scale.identity().domain([0, height]);
+    //
+    // function brushended(e) {
+    //
+    //   if (!event.sourceEvent) return;
+    //
+    //   const extent = brush.extent();
+    //   brushGroup.call(brush.clear());
+    //
+    //   const zs = this._zoomBehavior.scale(), zt = this._zoomBehavior.translate();
+    //
+    //   const pos1 = extent[0].map((p, i) => (p - zt[i]) / (zs / this._polyZoom));
+    //   const pos2 = extent[1].map((p, i) => (p - zt[i]) / (zs / this._polyZoom));
+    //
+    //   zoomToBounds([pos1, pos2]);
+    //
+    // }
+    //
+    // var brush = d3.svg.brush()
+    //   .x(xBrush)
+    //   .y(yBrush)
+    //   .on("brushend", brushended);
+    //
+    // if (this._zoom) brushGroup.call(brush);
+
+    this._zoomBehavior
+      .scaleExtent([1, this._zoomMax])
+      .translateExtent([[0, 0], [width, height]])
+      .on("zoom", this._zoomed.bind(this));
+
+    const parent = this._zoomGroup;
+
     this._shapes.push(new shapes.Path()
       .config(this._shapeConfig)
       .config(this._shapeConfig.Path)
@@ -190,6 +304,8 @@ export default class Network extends Viz {
         .data(d.values)
         .render());
     });
+
+    this._zoomEvents();
 
     return this;
 
@@ -237,23 +353,6 @@ export default class Network extends Viz {
 
   /**
       @memberof Network
-      @desc If *value* is specified, sets the x accessor to the specified function or string matching a key in the data and returns the current class instance. The data passed to .data() takes priority over the .nodes() data array. If *value* is not specified, returns the current x accessor. By default, the x and y positions are determined dynamically based on default force layout properties.
-      @param {Function|String} [*value*]
-  */
-  x(_) {
-    if (arguments.length) {
-      if (typeof _ === "function") this._x = _;
-      else {
-        this._x = accessor(_);
-        if (!this._aggs[_]) this._aggs[_] = a => mean(a);
-      }
-      return this;
-    }
-    else return this._x;
-  }
-
-  /**
-      @memberof Network
       @desc If *value* is specified, sets the size accessor to the specified function or data key and returns the current class instance. If *value* is not specified, returns the current size accessor.
       @param {Function|String} [*value*]
   */
@@ -292,6 +391,23 @@ export default class Network extends Viz {
 
   /**
       @memberof Network
+      @desc If *value* is specified, sets the x accessor to the specified function or string matching a key in the data and returns the current class instance. The data passed to .data() takes priority over the .nodes() data array. If *value* is not specified, returns the current x accessor. By default, the x and y positions are determined dynamically based on default force layout properties.
+      @param {Function|String} [*value*]
+  */
+  x(_) {
+    if (arguments.length) {
+      if (typeof _ === "function") this._x = _;
+      else {
+        this._x = accessor(_);
+        if (!this._aggs[_]) this._aggs[_] = a => mean(a);
+      }
+      return this;
+    }
+    else return this._x;
+  }
+
+  /**
+      @memberof Network
       @desc If *value* is specified, sets the y accessor to the specified function or string matching a key in the data and returns the current class instance. The data passed to .data() takes priority over the .nodes() data array. If *value* is not specified, returns the current y accessor. By default, the x and y positions are determined dynamically based on default force layout properties.
       @param {Function|String} [*value*]
   */
@@ -305,6 +421,42 @@ export default class Network extends Viz {
       return this;
     }
     else return this._y;
+  }
+
+  /**
+      @memberof Network
+      @desc If *value* is specified, toggles overall zooming to the specified boolean and returns the current class instance. If *value* is not specified, returns the current overall zooming value.
+      @param {Boolean} [*value* = true]
+  */
+  zoom(_) {
+    return arguments.length ? (this._zoom = _, this) : this._zoom;
+  }
+
+  /**
+      @memberof Network
+      @desc If *value* is specified, sets the max zoom scale to the specified number and returns the current class instance. If *value* is not specified, returns the current max zoom scale.
+      @param {Number} [*value* = 16]
+  */
+  zoomMax(_) {
+    return arguments.length ? (this._zoomMax = _, this) : this._zoomMax;
+  }
+
+  /**
+      @memberof Network
+      @desc If *value* is specified, toggles panning to the specified boolean and returns the current class instance. If *value* is not specified, returns the current panning value.
+      @param {Boolean} [*value* = true]
+  */
+  zoomPan(_) {
+    return arguments.length ? (this._zoomPan = _, this) : this._zoomPan;
+  }
+
+  /**
+      @memberof Network
+      @desc If *value* is specified, toggles scroll zooming to the specified boolean and returns the current class instance. If *value* is not specified, returns the current scroll zooming value.
+      @param {Boolean} [*value* = true]
+  */
+  zoomScroll(_) {
+    return arguments.length ? (this._zoomScroll = _, this) : this._zoomScroll;
   }
 
 }
