@@ -146,9 +146,9 @@ export default class Network extends Viz {
       Handles adding/removing zoom event listeners.
       @private
   */
-  _zoomEvents(brush = false) {
+  _zoomEvents(brushing = false) {
 
-    if (brush) {
+    if (brushing) {
       this._brushGroup.style("display", "inline");
       this._networkGroup.on(".zoom", null);
     }
