@@ -34,21 +34,101 @@ export default class Network extends Viz {
     this._nodes = [];
     this._on["click.shape"] = (d, i) => {
 
-      const id = this._nodeGroupBy && this._nodeGroupBy[this._drawDepth](d, i) ? this._nodeGroupBy[this._drawDepth](d, i) : this._id(d, i),
-            links = this._linkLookup[id],
-            node = this._nodeLookup[id];
+      this._tooltipClass.data([]).render();
 
-      const xDomain = [node.x - node.r, node.x + node.r],
-            yDomain = [node.y - node.r, node.y + node.r];
+      if (this._hover && this._drawDepth >= this._groupBy.length - 1) {
 
-      links.forEach(l => {
-        if (l.x - l.r < xDomain[0]) xDomain[0] = l.x - l.r;
-        if (l.x + l.r > xDomain[1]) xDomain[1] = l.x + l.r;
-        if (l.y - l.r < yDomain[0]) yDomain[0] = l.y - l.r;
-        if (l.y + l.r > yDomain[1]) yDomain[1] = l.y + l.r;
-      });
+        if (this._focus && this._focus === d.id) {
 
-      this._zoomToBounds([[xDomain[0], yDomain[0]], [xDomain[1], yDomain[1]]]);
+          this.active(false);
+          this._on.mouseenter.bind(this)(d, i);
+
+          this._focus = undefined;
+          this._zoomToBounds(null);
+
+        }
+        else {
+
+          const id = this._nodeGroupBy && this._nodeGroupBy[this._drawDepth](d, i) ? this._nodeGroupBy[this._drawDepth](d, i) : this._id(d, i),
+                links = this._linkLookup[id],
+                node = this._nodeLookup[id];
+
+          const filterIds = [node.id],
+                xDomain = [node.x - node.r, node.x + node.r],
+                yDomain = [node.y - node.r, node.y + node.r];
+
+          links.forEach(l => {
+            filterIds.push(l.id);
+            if (l.x - l.r < xDomain[0]) xDomain[0] = l.x - l.r;
+            if (l.x + l.r > xDomain[1]) xDomain[1] = l.x + l.r;
+            if (l.y - l.r < yDomain[0]) yDomain[0] = l.y - l.r;
+            if (l.y + l.r > yDomain[1]) yDomain[1] = l.y + l.r;
+          });
+
+          const filterId = this._ids(d, i);
+
+          this.active((h, x) => {
+            if (h.source && h.target) return h.source.id === node.id || h.target.id === node.id;
+            else return filterIds.includes(this._ids(h, x)[filterId.length - 1]);
+          });
+
+          this._focus = d.id;
+          this._zoomToBounds([[xDomain[0], yDomain[0]], [xDomain[1], yDomain[1]]]);
+
+        }
+
+      }
+
+    };
+    this._on["click.legend"] = (d, i) => {
+
+      const ids = this._id(d);
+      let id = this._ids(d);
+      id = id[id.length - 1];
+
+      if (this._hover && this._drawDepth >= this._groupBy.length - 1) {
+
+        if (this._focus && this._focus === ids) {
+
+          this.active(false);
+          this._on.mouseenter.bind(this)(d, i);
+
+          this._focus = undefined;
+          this._zoomToBounds(null);
+
+        }
+        else {
+
+          const nodes = ids.map(id => this._nodeLookup[id]);
+
+          const filterIds = [id],
+                xDomain = [nodes[0].x - nodes[0].r, nodes[0].x + nodes[0].r],
+                yDomain = [nodes[0].y - nodes[0].r, nodes[0].y + nodes[0].r];
+
+          nodes.forEach(l => {
+            filterIds.push(l.id);
+            if (l.x - l.r < xDomain[0]) xDomain[0] = l.x - l.r;
+            if (l.x + l.r > xDomain[1]) xDomain[1] = l.x + l.r;
+            if (l.y - l.r < yDomain[0]) yDomain[0] = l.y - l.r;
+            if (l.y + l.r > yDomain[1]) yDomain[1] = l.y + l.r;
+          });
+
+          this.active((h, x) => {
+            if (h.source && h.target) return filterIds.includes(h.source.id) && filterIds.includes(h.target.id);
+            else {
+              const myIds = this._ids(h, x);
+              return filterIds.includes(myIds[myIds.length - 1]);
+            }
+          });
+
+          this._focus = ids;
+          this._zoomToBounds([[xDomain[0], yDomain[0]], [xDomain[1], yDomain[1]]]);
+
+        }
+
+        this._on["mousemove.legend"].bind(this)(d, i);
+
+      }
 
     };
     this._selectionConfig = {
@@ -192,23 +272,34 @@ export default class Network extends Viz {
   */
   _zoomToBounds(bounds) {
 
-    const [width, height] = this._zoomBehavior.translateExtent()[1];
+    if (bounds) {
 
-    const dx = bounds[1][0] - bounds[0][0],
-          dy = bounds[1][1] - bounds[0][1],
-          x = (bounds[0][0] + bounds[1][0]) / 2,
-          y = (bounds[0][1] + bounds[1][1]) / 2;
+      const [width, height] = this._zoomBehavior.translateExtent()[1];
 
-    const scale = Math.max(1, Math.min(this._zoomMax, 0.9 / Math.max(dx / width, dy / height)));
-    const translate = [width / 2 - scale * x, height / 2 - scale * y];
+      const dx = bounds[1][0] - bounds[0][0],
+            dy = bounds[1][1] - bounds[0][1],
+            x = (bounds[0][0] + bounds[1][0]) / 2,
+            y = (bounds[0][1] + bounds[1][1]) / 2;
 
-    const newZoom = zoomIdentity
-      .translate(translate[0], translate[1])
-      .scale(scale);
+      const scale = Math.max(1, Math.min(this._zoomMax, 0.9 / Math.max(dx / width, dy / height)));
+      const translate = [width / 2 - scale * x, height / 2 - scale * y];
 
-    this._networkGroup.transition()
-      .duration(this._zoomBehavior.duration())
-      .call(this._zoomBehavior.transform, newZoom);
+      const newZoom = zoomIdentity
+        .translate(translate[0], translate[1])
+        .scale(scale);
+
+      this._networkGroup.transition()
+        .duration(this._zoomBehavior.duration())
+        .call(this._zoomBehavior.transform, newZoom);
+
+    }
+    else {
+
+      this._networkGroup.transition()
+        .duration(this._zoomBehavior.duration())
+        .call(this._zoomBehavior.transform, zoomIdentity);
+
+    }
 
   }
 
