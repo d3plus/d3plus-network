@@ -1,3 +1,8 @@
+/**
+    @external Viz
+    @see https://github.com/d3plus/d3plus-viz#Viz
+*/
+
 import {extent, mean, min, merge} from "d3-array";
 import {brush} from "d3-brush";
 import {nest} from "d3-collection";
@@ -12,7 +17,7 @@ import {Viz} from "d3plus-viz";
 
 /**
     @class Network
-    @extends Viz
+    @extends external:Viz
     @desc Creates an x/y plot based on an array of data.
 */
 export default class Network extends Viz {
