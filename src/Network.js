@@ -33,12 +33,23 @@ export default class Network extends Viz {
     this._links = [];
     this._nodes = [];
     this._on["click.shape"] = (d, i) => {
+
       const id = this._nodeGroupBy && this._nodeGroupBy[this._drawDepth](d, i) ? this._nodeGroupBy[this._drawDepth](d, i) : this._id(d, i),
             links = this._linkLookup[id],
-            node = this._nodeLookup[id],
-            xDomain = extent(links.map(l => l.x).concat([node.x])),
-            yDomain = extent(links.map(l => l.y).concat([node.y]));
+            node = this._nodeLookup[id];
+
+      const xDomain = [node.x - node.r, node.x + node.r],
+            yDomain = [node.y - node.r, node.y + node.r];
+
+      links.forEach(l => {
+        if (l.x - l.r < xDomain[0]) xDomain[0] = l.x - l.r;
+        if (l.x + l.r > xDomain[1]) xDomain[1] = l.x + l.r;
+        if (l.y - l.r < yDomain[0]) yDomain[0] = l.y - l.r;
+        if (l.y + l.r > yDomain[1]) yDomain[1] = l.y + l.r;
+      });
+
       this._zoomToBounds([[xDomain[0], yDomain[0]], [xDomain[1], yDomain[1]]]);
+
     };
     this._selectionConfig = {
       "fill": "#777",
