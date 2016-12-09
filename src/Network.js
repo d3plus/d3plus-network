@@ -528,6 +528,7 @@ export default class Network extends Viz {
       @memberof Network
       @desc If *links* is specified, sets the links array to the specified array and returns the current class instance. If *links* is not specified, returns the current links array.
       @param {Array} [*links* = []]
+      @chainable
   */
   links(_) {
     return arguments.length ? (this._links = _, this) : this._links;
@@ -537,6 +538,7 @@ export default class Network extends Viz {
       @memberof Network
       @desc If *value* is specified, sets the node group accessor(s) to the specified string, function, or array of values and returns the current class instance. This method overrides the default .groupBy() function from being used with the data passed to .nodes(). If *value* is not specified, returns the current node group accessor.
       @param {String|Function|Array} [*value* = undefined]
+      @chainable
   */
   nodeGroupBy(_) {
     if (!arguments.length) return this._nodeGroupBy;
@@ -559,6 +561,7 @@ export default class Network extends Viz {
       @memberof Network
       @desc If *nodes* is specified, sets the nodes array to the specified array and returns the current class instance. If *nodes* is not specified, returns the current nodes array.
       @param {Array} [*nodes* = []]
+      @chainable
   */
   nodes(_) {
     return arguments.length ? (this._nodes = _, this) : this._nodes;
@@ -568,6 +571,7 @@ export default class Network extends Viz {
       @memberof Network
       @desc If *value* is specified, sets the size accessor to the specified function or data key and returns the current class instance. If *value* is not specified, returns the current size accessor.
       @param {Function|String} [*value*]
+      @chainable
   */
   size(_) {
     return arguments.length
@@ -579,6 +583,7 @@ export default class Network extends Viz {
       @memberof Network
       @desc If *value* is specified, sets the size scale maximum to the specified number and returns the current class instance. If *value* is not specified, returns the current size scale maximum. By default, the maximum size is determined by half the distance of the two closest nodes.
       @param {Number} [*value*]
+      @chainable
   */
   sizeMax(_) {
     return arguments.length ? (this._sizeMax = _, this) : this._sizeMax;
@@ -588,6 +593,7 @@ export default class Network extends Viz {
       @memberof Network
       @desc If *value* is specified, sets the size scale minimum to the specified number and returns the current class instance. If *value* is not specified, returns the current size scale minimum.
       @param {Number} [*value* = 5]
+      @chainable
   */
   sizeMin(_) {
     return arguments.length ? (this._sizeMin = _, this) : this._sizeMin;
@@ -597,6 +603,7 @@ export default class Network extends Viz {
       @memberof Network
       @desc If *value* is specified, sets the size scale to the specified string and returns the current class instance. If *value* is not specified, returns the current size scale.
       @param {String} [*value* = "sqrt"]
+      @chainable
   */
   sizeScale(_) {
     return arguments.length ? (this._sizeScale = _, this) : this._sizeScale;
@@ -606,6 +613,7 @@ export default class Network extends Viz {
       @memberof Network
       @desc If *value* is specified, sets the x accessor to the specified function or string matching a key in the data and returns the current class instance. The data passed to .data() takes priority over the .nodes() data array. If *value* is not specified, returns the current x accessor. By default, the x and y positions are determined dynamically based on default force layout properties.
       @param {Function|String} [*value*]
+      @chainable
   */
   x(_) {
     if (arguments.length) {
@@ -623,6 +631,7 @@ export default class Network extends Viz {
       @memberof Network
       @desc If *value* is specified, sets the y accessor to the specified function or string matching a key in the data and returns the current class instance. The data passed to .data() takes priority over the .nodes() data array. If *value* is not specified, returns the current y accessor. By default, the x and y positions are determined dynamically based on default force layout properties.
       @param {Function|String} [*value*]
+      @chainable
   */
   y(_) {
     if (arguments.length) {
@@ -640,6 +649,7 @@ export default class Network extends Viz {
       @memberof Network
       @desc If *value* is specified, toggles overall zooming to the specified boolean and returns the current class instance. If *value* is not specified, returns the current overall zooming value.
       @param {Boolean} [*value* = true]
+      @chainable
   */
   zoom(_) {
     return arguments.length ? (this._zoom = _, this) : this._zoom;
@@ -649,6 +659,7 @@ export default class Network extends Viz {
       @memberof Network
       @desc If *value* is specified, sets the max zoom scale to the specified number and returns the current class instance. If *value* is not specified, returns the current max zoom scale.
       @param {Number} [*value* = 16]
+      @chainable
   */
   zoomMax(_) {
     return arguments.length ? (this._zoomMax = _, this) : this._zoomMax;
@@ -658,6 +669,7 @@ export default class Network extends Viz {
       @memberof Network
       @desc If *value* is specified, toggles panning to the specified boolean and returns the current class instance. If *value* is not specified, returns the current panning value.
       @param {Boolean} [*value* = true]
+      @chainable
   */
   zoomPan(_) {
     return arguments.length ? (this._zoomPan = _, this) : this._zoomPan;
@@ -667,6 +679,7 @@ export default class Network extends Viz {
       @memberof Network
       @desc If *value* is specified, toggles scroll zooming to the specified boolean and returns the current class instance. If *value* is not specified, returns the current scroll zooming value.
       @param {Boolean} [*value* = true]
+      @chainable
   */
   zoomScroll(_) {
     return arguments.length ? (this._zoomScroll = _, this) : this._zoomScroll;
