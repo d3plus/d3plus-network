@@ -250,4 +250,4 @@ If *value* is specified, toggles scroll zooming to the specified boolean and ret
 
 
 
-###### <sub>Documentation generated on Fri, 09 Dec 2016 21:21:07 GMT</sub>
+###### <sub>Documentation generated on Tue, 20 Dec 2016 20:28:55 GMT</sub>
