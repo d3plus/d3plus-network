@@ -74,7 +74,7 @@ export default class Network extends Viz {
 
           this.active((h, x) => {
             if (h.source && h.target) return h.source.id === node.id || h.target.id === node.id;
-            else return filterIds.includes(this._ids(h, x)[filterId.length - 1]);
+            else return filterIds.includes(this._ids(h, x)[this._drawDepth]);
           });
 
           this._focus = d.id;
