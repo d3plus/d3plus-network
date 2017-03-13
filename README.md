@@ -69,7 +69,7 @@ new d3plus.Network()
 
 ### Network ⇐ <code>[Viz](https://github.com/d3plus/d3plus-viz#Viz)</code>
 **Kind**: global class  
-**Extends:** <code>[Viz](https://github.com/d3plus/d3plus-viz#Viz)</code>  
+**Extends**: <code>[Viz](https://github.com/d3plus/d3plus-viz#Viz)</code>  
 
 * [Network](#Network) ⇐ <code>[Viz](https://github.com/d3plus/d3plus-viz#Viz)</code>
     * [new Network()](#new_Network_new)
@@ -250,4 +250,4 @@ If *value* is specified, toggles scroll zooming to the specified boolean and ret
 
 
 
-###### <sub>Documentation generated on Tue, 20 Dec 2016 20:28:55 GMT</sub>
+###### <sub>Documentation generated on Mon, 13 Mar 2017 19:22:13 GMT</sub>
