@@ -70,8 +70,6 @@ export default class Network extends Viz {
             if (l.y + l.r > yDomain[1]) yDomain[1] = l.y + l.r;
           });
 
-          const filterId = this._ids(d, i);
-
           this.active((h, x) => {
             if (h.source && h.target) return h.source.id === node.id || h.target.id === node.id;
             else return filterIds.includes(this._ids(h, x)[this._drawDepth]);
