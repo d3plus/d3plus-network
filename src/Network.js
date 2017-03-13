@@ -340,11 +340,11 @@ export default class Network extends Viz {
         __d3plus__: true,
         data: d || n,
         i, id,
-        fx: d !== void 0 && this._x(d) !== void 0 ? this._x(d) : this._x(n),
-        fy: d !== void 0 && this._y(d) !== void 0 ? this._y(d) : this._y(n),
+        fx: d !== undefined && this._x(d) !== undefined ? this._x(d) : this._x(n),
+        fy: d !== undefined && this._y(d) !== undefined ? this._y(d) : this._y(n),
         node: n,
-        r: this._size ? d !== void 0 && this._size(d) !== void 0 ? this._size(d) : this._size(n) : 1,
-        shape: d !== void 0 && this._shape(d) !== void 0 ? this._shape(d) : this._shape(n)
+        r: this._size ? d !== undefined && this._size(d) !== undefined ? this._size(d) : this._size(n) : this._sizeMin,
+        shape: d !== undefined && this._shape(d) !== undefined ? this._shape(d) : this._shape(n)
       };
 
     });
@@ -376,7 +376,7 @@ export default class Network extends Viz {
     let rMax = this._sizeMax || min(
           merge(nodes
             .map(n1 => nodes
-              .map(n2 => n1 === n2 ? null : shapes.pointDistance(n1, n2))
+              .map(n2 => n1 === n2 ? null : shapes.pointDistance([n1.x, n1.y], [n2.x, n2.y]))
             )
           )
         ) / 2;
