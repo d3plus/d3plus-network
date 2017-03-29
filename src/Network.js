@@ -142,14 +142,16 @@ export default class Network extends Viz {
     this._sizeScale = "sqrt";
     this._shape = constant("Circle");
     this._shapeConfig = assign(this._shapeConfig, {
+      labelConfig: {
+        textAnchor: "middle",
+        verticalAlign: "middle"
+      },
       Path: {
         fill: "none",
         label: false,
         stroke: "#eee",
         strokeWidth: 1
-      },
-      textAnchor: "middle",
-      verticalAlign: "middle"
+      }
     });
     this._x = accessor("x");
     this._y = accessor("y");
