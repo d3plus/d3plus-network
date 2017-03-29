@@ -114,7 +114,7 @@ If *value* is specified, sets the node group accessor(s) to the specified string
 
 | Param | Type |
 | --- | --- |
-| [*value*] | <code>String</code> &#124; <code>function</code> &#124; <code>Array</code> | 
+| [*value*] | <code>String</code> \| <code>function</code> \| <code>Array</code> | 
 
 <a name="Network.nodes"></a>
 
@@ -138,7 +138,7 @@ If *value* is specified, sets the size accessor to the specified function or dat
 
 | Param | Type |
 | --- | --- |
-| [*value*] | <code>function</code> &#124; <code>String</code> | 
+| [*value*] | <code>function</code> \| <code>String</code> | 
 
 <a name="Network.sizeMax"></a>
 
@@ -186,7 +186,7 @@ If *value* is specified, sets the x accessor to the specified function or string
 
 | Param | Type |
 | --- | --- |
-| [*value*] | <code>function</code> &#124; <code>String</code> | 
+| [*value*] | <code>function</code> \| <code>String</code> | 
 
 <a name="Network.y"></a>
 
@@ -198,7 +198,7 @@ If *value* is specified, sets the y accessor to the specified function or string
 
 | Param | Type |
 | --- | --- |
-| [*value*] | <code>function</code> &#124; <code>String</code> | 
+| [*value*] | <code>function</code> \| <code>String</code> | 
 
 <a name="Network.zoom"></a>
 
@@ -250,4 +250,4 @@ If *value* is specified, toggles scroll zooming to the specified boolean and ret
 
 
 
-###### <sub>Documentation generated on Mon, 13 Mar 2017 19:22:13 GMT</sub>
+###### <sub>Documentation generated on Wed, 29 Mar 2017 00:11:41 GMT</sub>
