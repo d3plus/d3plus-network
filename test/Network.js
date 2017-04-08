@@ -1,14 +1,10 @@
-import {test} from "tape";
+import zora from "zora";
 import {default as Network} from "../src/Network.js";
 
-test("Network", assert => {
+export default zora()
+  .test("Network", function *(assert) {
 
-  new Network()
-    .render(() => {
+    yield cb => new Network().render(cb);
+    assert.ok(true, "function success");
 
-      assert.true(true, "function success");
-      assert.end();
-
-    });
-
-});
+  });
