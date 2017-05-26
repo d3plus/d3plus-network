@@ -11,7 +11,7 @@ import {event} from "d3-selection";
 import * as scales from "d3-scale";
 import {zoom, zoomIdentity} from "d3-zoom";
 
-import {accessor, assign, attrize, constant, elem} from "d3plus-common";
+import {accessor, assign, attrize, configPrep, constant, elem} from "d3plus-common";
 import * as shapes from "d3plus-shape";
 import {Viz} from "d3plus-viz";
 
@@ -512,7 +512,7 @@ export default class Network extends Viz {
 
     nest().key(d => d.shape).entries(nodes).forEach(d => {
       this._shapes.push(new shapes[d.key]()
-        .config(this._shapeConfigPrep(d.key))
+        .config(configPrep.bind(this)(this._shapeConfig, "shape", d.key))
         .config(shapeConfig)
         .data(d.values)
         .render());
