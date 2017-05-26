@@ -1,15 +1,12 @@
 # d3plus-network
 
-[![NPM Release](http://img.shields.io/npm/v/d3plus-network.svg?style=flat)](https://www.npmjs.org/package/d3plus-network)
-[![Build Status](https://travis-ci.org/d3plus/d3plus-network.svg?branch=master)](https://travis-ci.org/d3plus/d3plus-network)
-[![Dependency Status](http://img.shields.io/david/d3plus/d3plus-network.svg?style=flat)](https://david-dm.org/d3plus/d3plus-network)
-[![Slack](https://img.shields.io/badge/Slack-Click%20to%20Join!-green.svg?style=social)](https://goo.gl/forms/ynrKdvusekAwRMPf2)
+[![NPM Release](http://img.shields.io/npm/v/d3plus-network.svg?style=flat)](https://www.npmjs.org/package/d3plus-network) [![Build Status](https://travis-ci.org/d3plus/d3plus-network.svg?branch=master)](https://travis-ci.org/d3plus/d3plus-network) [![Dependency Status](http://img.shields.io/david/d3plus/d3plus-network.svg?style=flat)](https://david-dm.org/d3plus/d3plus-network) [![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg?style=flat)](https://gitter.im/d3plus/)
 
 Javascript network visualizations built upon d3 modules.
 
 ## Installing
 
-If you use NPM, `npm install d3plus-network`. Otherwise, download the [latest release](https://github.com/d3plus/d3plus-network/releases/latest). The released bundle supports AMD, CommonJS, and vanilla environments. Create a [custom bundle using Rollup](https://github.com/rollup/rollup) or your preferred bundler. You can also load directly from [d3plus.org](https://d3plus.org):
+If you use NPM, run `npm install d3plus-network --save`. Otherwise, download the [latest release](https://github.com/d3plus/d3plus-network/releases/latest). The released bundle supports AMD, CommonJS, and vanilla environments. You can also load directly from [d3plus.org](https://d3plus.org):
 
 ```html
 <script src="https://d3plus.org/js/d3plus-network.v0.1.full.min.js"></script>
@@ -65,13 +62,20 @@ new d3plus.Network()
 
 
 ## API Reference
+
+##### Classes
+* [Network](#Network)
+
+---
+
 <a name="Network"></a>
+#### **Network** [<>](https://github.com/d3plus/d3plus-network/blob/master/src/Network.js#L18)
 
-### Network ⇐ <code>[Viz](https://github.com/d3plus/d3plus-viz#Viz)</code>
-**Kind**: global class  
-**Extends**: <code>[Viz](https://github.com/d3plus/d3plus-viz#Viz)</code>  
 
-* [Network](#Network) ⇐ <code>[Viz](https://github.com/d3plus/d3plus-viz#Viz)</code>
+This is a global class, and extends all of the methods and functionality of [<code>Viz</code>](https://github.com/d3plus/d3plus-viz#Viz).
+
+
+* [Network](#Network) ⇐ [<code>Viz</code>](https://github.com/d3plus/d3plus-viz#Viz)
     * [new Network()](#new_Network_new)
     * [.links([*links*])](#Network.links) ↩︎
     * [.nodeGroupBy([*value*])](#Network.nodeGroupBy) ↩︎
@@ -87,167 +91,104 @@ new d3plus.Network()
     * [.zoomPan([*value*])](#Network.zoomPan) ↩︎
     * [.zoomScroll([*value*])](#Network.zoomScroll) ↩︎
 
-<a name="new_Network_new"></a>
+<a name="new_Network_new" href="new_Network_new">#</a> new **Network**()
 
-#### new Network()
 Creates an x/y plot based on an array of data.
 
-<a name="Network.links"></a>
 
-#### Network.links([*links*]) ↩︎
+
+
+<a name="Network.links" href="Network.links">#</a> Network.**links**([*links*]) [<>](https://github.com/d3plus/d3plus-network/blob/master/src/Network.js#L533)
+
 If *links* is specified, sets the links array to the specified array and returns the current class instance. If *links* is not specified, returns the current links array.
 
-**Kind**: static method of <code>[Network](#Network)</code>  
-**Chainable**  
 
-| Param | Type | Default |
-| --- | --- | --- |
-| [*links*] | <code>Array</code> | <code>[]</code> | 
+This is a static method of [<code>Network</code>](#Network), and is chainable with other methods of this Class.
 
-<a name="Network.nodeGroupBy"></a>
+<a name="Network.nodeGroupBy" href="Network.nodeGroupBy">#</a> Network.**nodeGroupBy**([*value*]) [<>](https://github.com/d3plus/d3plus-network/blob/master/src/Network.js#L543)
 
-#### Network.nodeGroupBy([*value*]) ↩︎
 If *value* is specified, sets the node group accessor(s) to the specified string, function, or array of values and returns the current class instance. This method overrides the default .groupBy() function from being used with the data passed to .nodes(). If *value* is not specified, returns the current node group accessor.
 
-**Kind**: static method of <code>[Network](#Network)</code>  
-**Chainable**  
 
-| Param | Type |
-| --- | --- |
-| [*value*] | <code>String</code> \| <code>function</code> \| <code>Array</code> | 
+This is a static method of [<code>Network</code>](#Network), and is chainable with other methods of this Class.
 
-<a name="Network.nodes"></a>
+<a name="Network.nodes" href="Network.nodes">#</a> Network.**nodes**([*nodes*]) [<>](https://github.com/d3plus/d3plus-network/blob/master/src/Network.js#L566)
 
-#### Network.nodes([*nodes*]) ↩︎
 If *nodes* is specified, sets the nodes array to the specified array and returns the current class instance. If *nodes* is not specified, returns the current nodes array.
 
-**Kind**: static method of <code>[Network](#Network)</code>  
-**Chainable**  
 
-| Param | Type | Default |
-| --- | --- | --- |
-| [*nodes*] | <code>Array</code> | <code>[]</code> | 
+This is a static method of [<code>Network</code>](#Network), and is chainable with other methods of this Class.
 
-<a name="Network.size"></a>
+<a name="Network.size" href="Network.size">#</a> Network.**size**([*value*]) [<>](https://github.com/d3plus/d3plus-network/blob/master/src/Network.js#L576)
 
-#### Network.size([*value*]) ↩︎
 If *value* is specified, sets the size accessor to the specified function or data key and returns the current class instance. If *value* is not specified, returns the current size accessor.
 
-**Kind**: static method of <code>[Network](#Network)</code>  
-**Chainable**  
 
-| Param | Type |
-| --- | --- |
-| [*value*] | <code>function</code> \| <code>String</code> | 
+This is a static method of [<code>Network</code>](#Network), and is chainable with other methods of this Class.
 
-<a name="Network.sizeMax"></a>
+<a name="Network.sizeMax" href="Network.sizeMax">#</a> Network.**sizeMax**([*value*]) [<>](https://github.com/d3plus/d3plus-network/blob/master/src/Network.js#L588)
 
-#### Network.sizeMax([*value*]) ↩︎
 If *value* is specified, sets the size scale maximum to the specified number and returns the current class instance. If *value* is not specified, returns the current size scale maximum. By default, the maximum size is determined by half the distance of the two closest nodes.
 
-**Kind**: static method of <code>[Network](#Network)</code>  
-**Chainable**  
 
-| Param | Type |
-| --- | --- |
-| [*value*] | <code>Number</code> | 
+This is a static method of [<code>Network</code>](#Network), and is chainable with other methods of this Class.
 
-<a name="Network.sizeMin"></a>
+<a name="Network.sizeMin" href="Network.sizeMin">#</a> Network.**sizeMin**([*value*]) [<>](https://github.com/d3plus/d3plus-network/blob/master/src/Network.js#L598)
 
-#### Network.sizeMin([*value*]) ↩︎
 If *value* is specified, sets the size scale minimum to the specified number and returns the current class instance. If *value* is not specified, returns the current size scale minimum.
 
-**Kind**: static method of <code>[Network](#Network)</code>  
-**Chainable**  
 
-| Param | Type | Default |
-| --- | --- | --- |
-| [*value*] | <code>Number</code> | <code>5</code> | 
+This is a static method of [<code>Network</code>](#Network), and is chainable with other methods of this Class.
 
-<a name="Network.sizeScale"></a>
+<a name="Network.sizeScale" href="Network.sizeScale">#</a> Network.**sizeScale**([*value*]) [<>](https://github.com/d3plus/d3plus-network/blob/master/src/Network.js#L608)
 
-#### Network.sizeScale([*value*]) ↩︎
 If *value* is specified, sets the size scale to the specified string and returns the current class instance. If *value* is not specified, returns the current size scale.
 
-**Kind**: static method of <code>[Network](#Network)</code>  
-**Chainable**  
 
-| Param | Type | Default |
-| --- | --- | --- |
-| [*value*] | <code>String</code> | <code>&quot;sqrt&quot;</code> | 
+This is a static method of [<code>Network</code>](#Network), and is chainable with other methods of this Class.
 
-<a name="Network.x"></a>
+<a name="Network.x" href="Network.x">#</a> Network.**x**([*value*]) [<>](https://github.com/d3plus/d3plus-network/blob/master/src/Network.js#L618)
 
-#### Network.x([*value*]) ↩︎
 If *value* is specified, sets the x accessor to the specified function or string matching a key in the data and returns the current class instance. The data passed to .data() takes priority over the .nodes() data array. If *value* is not specified, returns the current x accessor. By default, the x and y positions are determined dynamically based on default force layout properties.
 
-**Kind**: static method of <code>[Network](#Network)</code>  
-**Chainable**  
 
-| Param | Type |
-| --- | --- |
-| [*value*] | <code>function</code> \| <code>String</code> | 
+This is a static method of [<code>Network</code>](#Network), and is chainable with other methods of this Class.
 
-<a name="Network.y"></a>
+<a name="Network.y" href="Network.y">#</a> Network.**y**([*value*]) [<>](https://github.com/d3plus/d3plus-network/blob/master/src/Network.js#L636)
 
-#### Network.y([*value*]) ↩︎
 If *value* is specified, sets the y accessor to the specified function or string matching a key in the data and returns the current class instance. The data passed to .data() takes priority over the .nodes() data array. If *value* is not specified, returns the current y accessor. By default, the x and y positions are determined dynamically based on default force layout properties.
 
-**Kind**: static method of <code>[Network](#Network)</code>  
-**Chainable**  
 
-| Param | Type |
-| --- | --- |
-| [*value*] | <code>function</code> \| <code>String</code> | 
+This is a static method of [<code>Network</code>](#Network), and is chainable with other methods of this Class.
 
-<a name="Network.zoom"></a>
+<a name="Network.zoom" href="Network.zoom">#</a> Network.**zoom**([*value*]) [<>](https://github.com/d3plus/d3plus-network/blob/master/src/Network.js#L654)
 
-#### Network.zoom([*value*]) ↩︎
 If *value* is specified, toggles overall zooming to the specified boolean and returns the current class instance. If *value* is not specified, returns the current overall zooming value.
 
-**Kind**: static method of <code>[Network](#Network)</code>  
-**Chainable**  
 
-| Param | Type | Default |
-| --- | --- | --- |
-| [*value*] | <code>Boolean</code> | <code>true</code> | 
+This is a static method of [<code>Network</code>](#Network), and is chainable with other methods of this Class.
 
-<a name="Network.zoomMax"></a>
+<a name="Network.zoomMax" href="Network.zoomMax">#</a> Network.**zoomMax**([*value*]) [<>](https://github.com/d3plus/d3plus-network/blob/master/src/Network.js#L664)
 
-#### Network.zoomMax([*value*]) ↩︎
 If *value* is specified, sets the max zoom scale to the specified number and returns the current class instance. If *value* is not specified, returns the current max zoom scale.
 
-**Kind**: static method of <code>[Network](#Network)</code>  
-**Chainable**  
 
-| Param | Type | Default |
-| --- | --- | --- |
-| [*value*] | <code>Number</code> | <code>16</code> | 
+This is a static method of [<code>Network</code>](#Network), and is chainable with other methods of this Class.
 
-<a name="Network.zoomPan"></a>
+<a name="Network.zoomPan" href="Network.zoomPan">#</a> Network.**zoomPan**([*value*]) [<>](https://github.com/d3plus/d3plus-network/blob/master/src/Network.js#L674)
 
-#### Network.zoomPan([*value*]) ↩︎
 If *value* is specified, toggles panning to the specified boolean and returns the current class instance. If *value* is not specified, returns the current panning value.
 
-**Kind**: static method of <code>[Network](#Network)</code>  
-**Chainable**  
 
-| Param | Type | Default |
-| --- | --- | --- |
-| [*value*] | <code>Boolean</code> | <code>true</code> | 
+This is a static method of [<code>Network</code>](#Network), and is chainable with other methods of this Class.
 
-<a name="Network.zoomScroll"></a>
+<a name="Network.zoomScroll" href="Network.zoomScroll">#</a> Network.**zoomScroll**([*value*]) [<>](https://github.com/d3plus/d3plus-network/blob/master/src/Network.js#L684)
 
-#### Network.zoomScroll([*value*]) ↩︎
 If *value* is specified, toggles scroll zooming to the specified boolean and returns the current class instance. If *value* is not specified, returns the current scroll zooming value.
 
-**Kind**: static method of <code>[Network](#Network)</code>  
-**Chainable**  
 
-| Param | Type | Default |
-| --- | --- | --- |
-| [*value*] | <code>Boolean</code> | <code>true</code> | 
+This is a static method of [<code>Network</code>](#Network), and is chainable with other methods of this Class.
 
+---
 
-
-###### <sub>Documentation generated on Wed, 29 Mar 2017 00:11:41 GMT</sub>
+###### <sub>Documentation generated on Fri, 26 May 2017 18:50:57 GMT</sub>
