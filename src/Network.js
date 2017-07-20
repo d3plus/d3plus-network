@@ -18,7 +18,7 @@ import {Viz} from "d3plus-viz";
 /**
     @class Network
     @extends external:Viz
-    @desc Creates an x/y plot based on an array of data.
+    @desc Creates a network visualization based on a defined set of nodes and edges. [Click here](http://d3plus.org/examples/d3plus-network/getting-started/) for help getting started using the Network class.
 */
 export default class Network extends Viz {
 
@@ -526,7 +526,10 @@ export default class Network extends Viz {
 
   /**
       @memberof Network
-      @desc If *links* is specified, sets the links array to the specified array and returns the current class instance. If *links* is not specified, returns the current links array.
+      @desc A predefined *Array* of edges that connect each object passed to the [node](#Network.node) method. The `source` and `target` keys in each link need to map to the nodes in one of three ways:
+1. The index of the node in the nodes array (as in [this](http://d3plus.org/examples/d3plus-network/getting-started/) example).
+2. The actual node *Object* itself.
+3. A *String* value matching the `id` of the node.
       @param {Array} [*links* = []]
       @chainable
   */
