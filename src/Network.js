@@ -374,12 +374,12 @@ export default class Network extends Viz {
 
     const rExtent = extent(nodes.map(n => n.r));
     let rMax = this._sizeMax || min(
-          merge(nodes
-            .map(n1 => nodes
-              .map(n2 => n1 === n2 ? null : shapes.pointDistance([n1.x, n1.y], [n2.x, n2.y]))
-            )
-          )
-        ) / 2;
+      merge(nodes
+        .map(n1 => nodes
+          .map(n2 => n1 === n2 ? null : shapes.pointDistance([n1.x, n1.y], [n2.x, n2.y]))
+        )
+      )
+    ) / 2;
 
     const r = scales[`scale${this._sizeScale.charAt(0).toUpperCase()}${this._sizeScale.slice(1)}`]()
                 .domain(rExtent).range([rExtent[0] === rExtent[1] ? rMax : min([rMax / 2, this._sizeMin]), rMax]),
@@ -426,11 +426,11 @@ export default class Network extends Viz {
     const nodeIndices = nodes.map(n => n.node);
     const links = this._links.map(l => ({
       source: typeof l.source === "number"
-            ? nodes[nodeIndices.indexOf(this._nodes[l.source])]
-            : nodeLookup[l.source.id],
+        ? nodes[nodeIndices.indexOf(this._nodes[l.source])]
+        : nodeLookup[l.source.id],
       target: typeof l.target === "number"
-            ? nodes[nodeIndices.indexOf(this._nodes[l.target])]
-            : nodeLookup[l.target.id]
+        ? nodes[nodeIndices.indexOf(this._nodes[l.target])]
+        : nodeLookup[l.target.id]
     }));
 
     this._linkLookup = links.reduce((obj, d) => {
@@ -574,9 +574,7 @@ export default class Network extends Viz {
       @chainable
   */
   size(_) {
-    return arguments.length
-         ? (this._size = typeof _ === "function" || !_ ? _ : accessor(_), this)
-         : this._size;
+    return arguments.length ? (this._size = typeof _ === "function" || !_ ? _ : accessor(_), this) : this._size;
   }
 
   /**
