@@ -210,4 +210,4 @@ This is a static method of [<code>Network</code>](#Network), and is chainable wi
 
 
 
-###### <sub>Documentation generated on Thu, 20 Jul 2017 12:19:40 GMT</sub>
+###### <sub>Documentation generated on Thu, 20 Jul 2017 12:20:40 GMT</sub>
