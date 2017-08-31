@@ -191,8 +191,6 @@ export default class Network extends Viz {
     //              .map(this._d3Scale.invert)
     //              .map(Number);
 
-    console.log(event.selection);
-
     // const pixelDomain = domain.map(this._d3Scale),
     //       single = pixelDomain[0] === pixelDomain[1];
     // if (single) {
