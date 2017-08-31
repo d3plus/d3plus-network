@@ -1,6 +1,6 @@
-# Simple Network
+# Simple Network Graph
 
-Given an array of nodes and an array of links, d3plus-network creates a simple network visualization based on the supplied x and y coordinates.
+Given an array of [nodes](http://d3plus.org/docs/#Network.nodes) and an array of [links](http://d3plus.org/docs/#Network.links), [d3plus-network](https://github.com/d3plus/d3plus-network) creates a simple network visualization based on the supplied x and y coordinates.
 
 ```js
 var nodes = [
