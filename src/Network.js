@@ -4,14 +4,12 @@
 */
 
 import {extent, mean, min, merge} from "d3-array";
-import {brush} from "d3-brush";
 import {nest} from "d3-collection";
 // import {forceSimulation} from "d3-force";
-import {event} from "d3-selection";
 import * as scales from "d3-scale";
-import {zoom, zoomIdentity} from "d3-zoom";
+import {zoomTransform} from "d3-zoom";
 
-import {accessor, assign, attrize, configPrep, constant, elem} from "d3plus-common";
+import {accessor, assign, configPrep, constant, elem} from "d3plus-common";
 import * as shapes from "d3plus-shape";
 import {Viz} from "d3plus-viz";
 
@@ -30,11 +28,6 @@ export default class Network extends Viz {
   constructor() {
 
     super();
-    this._brushFilter = () => !event.button && event.detail < 2;
-    this._handleConfig = {
-      fill: "#444"
-    };
-    this._handleSize = 6;
     this._links = [];
     this._nodes = [];
     this._on["click.shape"] = (d, i) => {
@@ -58,9 +51,9 @@ export default class Network extends Viz {
                 links = this._linkLookup[id],
                 node = this._nodeLookup[id];
 
-          const filterIds = [node.id],
-                xDomain = [node.x - node.r, node.x + node.r],
-                yDomain = [node.y - node.r, node.y + node.r];
+          const filterIds = [node.id];
+          let xDomain = [node.x - node.r, node.x + node.r],
+              yDomain = [node.y - node.r, node.y + node.r];
 
           links.forEach(l => {
             filterIds.push(l.id);
@@ -76,6 +69,9 @@ export default class Network extends Viz {
           });
 
           this._focus = d.id;
+          const t = zoomTransform(this._container.node());
+          xDomain = xDomain.map(d => d * t.k + t.x);
+          yDomain = yDomain.map(d => d * t.k + t.y);
           this._zoomToBounds([[xDomain[0], yDomain[0]], [xDomain[1], yDomain[1]]]);
 
         }
@@ -104,9 +100,9 @@ export default class Network extends Viz {
 
           const nodes = ids.map(id => this._nodeLookup[id]);
 
-          const filterIds = [id],
-                xDomain = [nodes[0].x - nodes[0].r, nodes[0].x + nodes[0].r],
-                yDomain = [nodes[0].y - nodes[0].r, nodes[0].y + nodes[0].r];
+          const filterIds = [id];
+          let xDomain = [nodes[0].x - nodes[0].r, nodes[0].x + nodes[0].r],
+              yDomain = [nodes[0].y - nodes[0].r, nodes[0].y + nodes[0].r];
 
           nodes.forEach(l => {
             filterIds.push(l.id);
@@ -125,6 +121,9 @@ export default class Network extends Viz {
           });
 
           this._focus = ids;
+          const t = zoomTransform(this._container.node());
+          xDomain = xDomain.map(d => d * t.k + t.x);
+          yDomain = yDomain.map(d => d * t.k + t.y);
           this._zoomToBounds([[xDomain[0], yDomain[0]], [xDomain[1], yDomain[1]]]);
 
         }
@@ -133,10 +132,6 @@ export default class Network extends Viz {
 
       }
 
-    };
-    this._selectionConfig = {
-      "fill": "#777",
-      "stroke-width": 0
     };
     this._sizeMin = 5;
     this._sizeScale = "sqrt";
@@ -157,162 +152,16 @@ export default class Network extends Viz {
     this._y = accessor("y");
 
     this._zoom = true;
-    this._zoomBehavior = zoom();
-    this._zoomBrush = brush()
-      .on("start", this._brushStart.bind(this))
-      .on("brush", this._brushBrush.bind(this))
-      .on("end", this._brushEnd.bind(this));
-    this._zoomMax = 16;
-    this._zoomPan = true;
-    this._zoomScroll = true;
 
   }
 
   /**
-      @memberof Network
-      @desc Triggered on brush "brush".
+      Extends the draw behavior of the abstract Viz class.
       @private
   */
-  _brushBrush() {
-    this._brushStyle();
-  }
+  _draw(callback) {
 
-  /**
-      @memberof Network
-      @desc Triggered on brush "end".
-      @private
-  */
-  _brushEnd() {
-
-    if (!event.sourceEvent) return; // Only transition after input.
-
-    // const domain = (event.selection ? event.selection
-    //              : [event.sourceEvent.offsetX, event.sourceEvent.offsetX])
-    //              .map(this._d3Scale.invert)
-    //              .map(Number);
-
-    // const pixelDomain = domain.map(this._d3Scale),
-    //       single = pixelDomain[0] === pixelDomain[1];
-    // if (single) {
-    //   pixelDomain[0] -= 0.1;
-    //   pixelDomain[1] += 0.1;
-    // }
-    //
-    // this._brushGroup.transition(this._transition).call(this._brush.move, pixelDomain);
-
-    this._brushStyle();
-
-  }
-
-  /**
-      @memberof Network
-      @desc Triggered on brush "start".
-      @private
-  */
-  _brushStart() {
-    this._brushStyle();
-  }
-
-  /**
-      @memberof Network
-      @desc Overrides the default brush styles.
-      @private
-  */
-  _brushStyle() {
-
-    this._brushGroup.selectAll(".selection")
-      .call(attrize, this._selectionConfig);
-
-    this._brushGroup.selectAll(".handle")
-      .call(attrize, this._handleConfig);
-
-  }
-
-  /**
-      Handles events dispatched from this._zoomBehavior
-      @private
-  */
-  _zoomed() {
-    this._zoomGroup.attr("transform", event.transform);
-  }
-
-  /**
-      Handles adding/removing zoom event listeners.
-      @private
-  */
-  _zoomEvents(brushing = false) {
-
-    if (brushing) {
-      this._brushGroup.style("display", "inline");
-      this._networkGroup.on(".zoom", null);
-    }
-    else if (this._zoom) {
-      this._brushGroup.style("display", "none");
-      this._networkGroup.call(this._zoomBehavior);
-      if (!this._zoomScroll) {
-        this._networkGroup
-          .on("mousewheel.zoom", null)
-          .on("MozMousePixelScroll.zoom", null)
-          .on("wheel.zoom", null);
-      }
-      if (!this._zoomPan) {
-        this._networkGroup
-          .on("mousedown.zoom", null)
-          .on("mousemove.zoom", null)
-          .on("touchstart.zoom", null)
-          .on("touchmove.zoom", null);
-      }
-    }
-    else {
-      this._networkGroup.on(".zoom", null);
-    }
-
-  }
-
-  /**
-      Zooms to given bounds.
-      @private
-  */
-  _zoomToBounds(bounds) {
-
-    if (bounds) {
-
-      const [width, height] = this._zoomBehavior.translateExtent()[1];
-
-      const dx = bounds[1][0] - bounds[0][0],
-            dy = bounds[1][1] - bounds[0][1],
-            x = (bounds[0][0] + bounds[1][0]) / 2,
-            y = (bounds[0][1] + bounds[1][1]) / 2;
-
-      const scale = Math.max(1, Math.min(this._zoomMax, 0.9 / Math.max(dx / width, dy / height)));
-      const translate = [width / 2 - scale * x, height / 2 - scale * y];
-
-      const newZoom = zoomIdentity
-        .translate(translate[0], translate[1])
-        .scale(scale);
-
-      this._networkGroup.transition()
-        .duration(this._zoomBehavior.duration())
-        .call(this._zoomBehavior.transform, newZoom);
-
-    }
-    else {
-
-      this._networkGroup.transition()
-        .duration(this._zoomBehavior.duration())
-        .call(this._zoomBehavior.transform, zoomIdentity);
-
-    }
-
-  }
-
-  /**
-      Extends the render behavior of the abstract Viz class.
-      @private
-  */
-  render(callback) {
-
-    super.render(callback);
+    super._draw(callback);
 
     const height = this._height - this._margin.top - this._margin.bottom,
           transform = `translate(${this._margin.left}, ${this._margin.top})`,
@@ -439,22 +288,26 @@ export default class Network extends Viz {
       return obj;
     }, {});
 
-    this._networkGroup = this._select.selectAll("svg.d3plus-network-svg").data([0]);
+    this._container = this._select.selectAll("svg.d3plus-network").data([0]);
 
-    this._networkGroup = this._networkGroup.enter().append("svg")
-        .attr("class", "d3plus-network-svg")
+    this._container = this._container.enter().append("svg")
+        .attr("class", "d3plus-network")
         .attr("opacity", 0)
         .attr("width", width)
         .attr("height", height)
+        .attr("x", this._margin.left)
+        .attr("y", this._margin.top)
         .style("background-color", "transparent")
-      .merge(this._networkGroup);
+      .merge(this._container);
 
-    this._networkGroup.transition(this._transition)
+    this._container.transition(this._transition)
       .attr("opacity", 1)
       .attr("width", width)
-      .attr("height", height);
+      .attr("height", height)
+      .attr("x", this._margin.left)
+      .attr("y", this._margin.top);
 
-    const hitArea = this._networkGroup.selectAll("rect.d3plus-network-hitArea").data([0]);
+    const hitArea = this._container.selectAll("rect.d3plus-network-hitArea").data([0]);
     hitArea.enter().append("rect")
         .attr("class", "d3plus-network-hitArea")
       .merge(hitArea)
@@ -462,36 +315,10 @@ export default class Network extends Viz {
         .attr("height", height)
         .attr("fill", "transparent");
 
-    this._zoomGroup = this._networkGroup.selectAll("g.d3plus-network-zoomGroup").data([0]);
-    this._zoomGroup = this._zoomGroup.enter().append("g")
+    this._zoomGroup = this._container.selectAll("g.d3plus-network-zoomGroup").data([0]);
+    const parent = this._zoomGroup = this._zoomGroup.enter().append("g")
         .attr("class", "d3plus-network-zoomGroup")
       .merge(this._zoomGroup);
-
-    this._zoomBrush
-      .extent([[0, 0], [width, height]])
-      .filter(this._brushFilter)
-      .handleSize(this._handleSize);
-
-    const brushGroup = this._select.selectAll("g.brush").data([0]);
-    this._brushGroup = brushGroup.enter().append("g")
-        .attr("class", "brush")
-      .merge(brushGroup)
-      .call(this._zoomBrush);
-
-    // select("body")
-    //   .on(`keydown.network-${this.uuid}`, () => {
-    //     if (event.keyCode === 16) this._zoomEvents(true);
-    //   })
-    //   .on(`keyup.network-${this.uuid}`, () => {
-    //     if (event.keyCode === 16) this._zoomEvents(false);
-    //   });
-
-    this._zoomBehavior
-      .scaleExtent([1, this._zoomMax])
-      .translateExtent([[0, 0], [width, height]])
-      .on("zoom", this._zoomed.bind(this));
-
-    const parent = this._zoomGroup;
 
     this._shapes.push(new shapes.Path()
       .config(this._shapeConfig)
@@ -515,8 +342,6 @@ export default class Network extends Viz {
         .data(d.values)
         .render());
     });
-
-    this._zoomEvents();
 
     return this;
 
@@ -642,46 +467,6 @@ export default class Network extends Viz {
       return this;
     }
     else return this._y;
-  }
-
-  /**
-      @memberof Network
-      @desc If *value* is specified, toggles overall zooming to the specified boolean and returns the current class instance. If *value* is not specified, returns the current overall zooming value.
-      @param {Boolean} [*value* = true]
-      @chainable
-  */
-  zoom(_) {
-    return arguments.length ? (this._zoom = _, this) : this._zoom;
-  }
-
-  /**
-      @memberof Network
-      @desc If *value* is specified, sets the max zoom scale to the specified number and returns the current class instance. If *value* is not specified, returns the current max zoom scale.
-      @param {Number} [*value* = 16]
-      @chainable
-  */
-  zoomMax(_) {
-    return arguments.length ? (this._zoomMax = _, this) : this._zoomMax;
-  }
-
-  /**
-      @memberof Network
-      @desc If *value* is specified, toggles panning to the specified boolean and returns the current class instance. If *value* is not specified, returns the current panning value.
-      @param {Boolean} [*value* = true]
-      @chainable
-  */
-  zoomPan(_) {
-    return arguments.length ? (this._zoomPan = _, this) : this._zoomPan;
-  }
-
-  /**
-      @memberof Network
-      @desc If *value* is specified, toggles scroll zooming to the specified boolean and returns the current class instance. If *value* is not specified, returns the current scroll zooming value.
-      @param {Boolean} [*value* = true]
-      @chainable
-  */
-  zoomScroll(_) {
-    return arguments.length ? (this._zoomScroll = _, this) : this._zoomScroll;
   }
 
 }
