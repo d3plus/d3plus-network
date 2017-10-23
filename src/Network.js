@@ -183,6 +183,8 @@ export default class Network extends Viz {
       const d = data[id],
             n = nodes[id];
 
+      if (n === undefined) return false;
+
       return {
         __d3plus__: true,
         data: d || n,
@@ -194,7 +196,7 @@ export default class Network extends Viz {
         shape: d !== undefined && this._shape(d) !== undefined ? this._shape(d) : this._shape(n)
       };
 
-    });
+    }).filter(n => n);
 
     const xExtent = extent(nodes.map(n => n.fx)),
           yExtent = extent(nodes.map(n => n.fy));
