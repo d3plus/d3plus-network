@@ -63,7 +63,7 @@ new d3plus.Network()
 
 ## API Reference
 
-##### Classes
+##### 
 * [Network](#Network)
 
 ---
@@ -190,4 +190,4 @@ This is a static method of [<code>Network</code>](#Network), and is chainable wi
 
 
 
-###### <sub>Documentation generated on Mon, 23 Oct 2017 19:26:10 GMT</sub>
+###### <sub>Documentation generated on Thu, 21 Dec 2017 22:25:23 GMT</sub>
