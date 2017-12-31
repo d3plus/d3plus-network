@@ -28,6 +28,7 @@ export default class Network extends Viz {
   constructor() {
 
     super();
+    this._labelCutoff = 100;
     this._links = [];
     this._nodes = [];
     this._on["click.shape"] = (d, i) => {
@@ -46,6 +47,8 @@ export default class Network extends Viz {
 
         }
         else {
+
+          this.hover(false);
 
           const id = this._nodeGroupBy && this._nodeGroupBy[this._drawDepth](d, i) ? this._nodeGroupBy[this._drawDepth](d, i) : this._id(d, i),
                 links = this._linkLookup[id],
@@ -98,6 +101,8 @@ export default class Network extends Viz {
         }
         else {
 
+          this.hover(false);
+
           const nodes = ids.map(id => this._nodeLookup[id]);
 
           const filterIds = [id];
@@ -138,9 +143,13 @@ export default class Network extends Viz {
     this._shape = constant("Circle");
     this._shapeConfig = assign(this._shapeConfig, {
       labelConfig: {
+        duration: 0,
+        fontMin: 1,
+        fontResize: true,
         textAnchor: "middle",
         verticalAlign: "middle"
       },
+      labelPadding: 0,
       Path: {
         fill: "none",
         label: false,
@@ -327,13 +336,11 @@ export default class Network extends Viz {
       .config(this._shapeConfig.Path)
       .d(d => `M${d.source.x},${d.source.y} ${d.target.x},${d.target.y}`)
       .data(links)
-      // .duration(0)
       .select(elem("g.d3plus-network-links", {parent, transition, enter: {transform}, update: {transform}}).node())
       .render());
 
     const shapeConfig = {
-      // duration: 0,
-      label: d => this._drawLabel(d.data || d.node, d.i),
+      label: d => nodes.length <= this._labelCutoff || (this._hover && this._hover(d) || this._active && this._active(d)) ? this._drawLabel(d.data || d.node, d.i) : false,
       select: elem("g.d3plus-network-nodes", {parent, transition, enter: {transform}, update: {transform}}).node()
     };
 
@@ -341,12 +348,23 @@ export default class Network extends Viz {
       this._shapes.push(new shapes[d.key]()
         .config(configPrep.bind(this)(this._shapeConfig, "shape", d.key))
         .config(shapeConfig)
+        .config(shapeConfig[d.key] || {})
         .data(d.values)
         .render());
     });
 
     return this;
 
+  }
+
+  /**
+      @memberof Network
+      @desc Defines the maximum number of nodes that allow all labels to be shown. When the number of nodes is over this amount, labels will only be shown on hover and click.
+      @param {Number} *value* = 100
+      @chainable
+  */
+  labelCutoff(_) {
+    return arguments.length ? (this._labelCutoff = _, this) : this._labelCutoff;
   }
 
   /**
