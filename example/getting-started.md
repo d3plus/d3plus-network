@@ -14,6 +14,7 @@ var nodes = [
 ```
 
 The `source` and `target` keys in each link need to map to the nodes in one of three ways:
+
 1. The index of the node in the nodes array (as in this example).
 2. The actual node *Object* itself.
 3. A *String* value matching the `id` of the node.
