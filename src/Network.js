@@ -324,7 +324,14 @@ export default class Network extends Viz {
       .merge(hitArea)
         .attr("width", width)
         .attr("height", height)
-        .attr("fill", "transparent");
+        .attr("fill", "transparent")
+        .on("click", () => {
+          if (this._focus) {
+            this.active(false);
+            this._focus = undefined;
+            this._zoomToBounds(null);
+          }
+        });
 
     this._zoomGroup = this._container.selectAll("g.d3plus-network-zoomGroup").data([0]);
     const parent = this._zoomGroup = this._zoomGroup.enter().append("g")
