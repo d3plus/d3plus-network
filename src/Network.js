@@ -146,10 +146,10 @@ export default class Network extends Viz {
         duration: 0,
         fontMin: 1,
         fontResize: true,
+        labelPadding: 0,
         textAnchor: "middle",
         verticalAlign: "middle"
       },
-      labelPadding: 0,
       Path: {
         fill: "none",
         label: false,
