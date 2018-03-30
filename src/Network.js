@@ -31,6 +31,7 @@ export default class Network extends Viz {
     this._labelCutoff = 100;
     this._links = [];
     this._nodes = [];
+    this._noDataMessage = false;
     this._on["click.shape"] = (d, i) => {
 
       this._tooltipClass.data([]).render();
