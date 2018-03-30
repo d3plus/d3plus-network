@@ -28,7 +28,7 @@
     "d3-scale": "^2.0.0",
     "d3plus-common": "^0.6.33",
     "d3plus-shape": "^0.14.2",
-    "d3plus-viz": "^0.10.18"
+    "d3plus-viz": "^0.11.0"
   },
   "scripts": {
     "build": "d3plus-build",
