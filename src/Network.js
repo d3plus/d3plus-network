@@ -387,7 +387,14 @@ The value passed should either be an *Array* of data or a *String* representing 
       @chainable
   */
   links(_, f) {
-    return arguments.length ? (this._queue.push([load.bind(this), _, f, "links"]), this) : this._links;
+    if (arguments.length) {
+      const prev = this._queue.find(q => q[3] === "links");
+      const d = [load.bind(this), _, f, "links"];
+      if (prev) this._queue[this._queue.indexOf(prev)] = d;
+      else this._queue.push(d);
+      return this;
+    }
+    return this._links;
   }
 
   /**
@@ -423,7 +430,14 @@ Additionally, a custom formatting function can be passed as a second argument to
       @chainable
   */
   nodes(_, f) {
-    return arguments.length ? (this._queue.push([load.bind(this), _, f, "nodes"]), this) : this._nodes;
+    if (arguments.length) {
+      const prev = this._queue.find(q => q[3] === "nodes");
+      const d = [load.bind(this), _, f, "nodes"];
+      if (prev) this._queue[this._queue.indexOf(prev)] = d;
+      else this._queue.push(d);
+      return this;
+    }
+    return this._nodes;
   }
 
   /**
