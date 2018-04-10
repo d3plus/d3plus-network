@@ -30,6 +30,7 @@ export default class Network extends Viz {
     super();
     this._labelCutoff = 100;
     this._links = [];
+    this._noDataMessage = false;
     this._nodes = [];
     this._on["click.shape"] = (d, i) => {
 
