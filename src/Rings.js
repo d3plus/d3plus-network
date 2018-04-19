@@ -76,7 +76,7 @@ export default class Rings extends Viz {
 
       }
     };
-    this._on["click.shape"] = (d) => {
+    this._on["click.shape"] = d => {
       this._center = d.id;
       this._draw();
     };
@@ -175,8 +175,10 @@ export default class Rings extends Viz {
       return obj;
     }, {});
 
-    const nodeIds = Array.from(new Set(this._links.reduce((ids, link) => ids.concat([link.source, link.target]), [])));
-    this._nodes = nodeIds.map(id => typeof id === "object" ? id : {id});
+    if (!this._nodes.length && this._links.length) {
+      const nodeIds = Array.from(new Set(this._links.reduce((ids, link) => ids.concat([link.source, link.target]), [])));
+      this._nodes = nodeIds.map(node => typeof node === "object" ? node : {id: node});
+    }
 
     let nodes = this._nodes.reduce((obj, d, i) => {
       obj[this._nodeGroupBy ? this._nodeGroupBy[this._drawDepth](d, i) : this._id(d, i)] = d;
@@ -208,7 +210,24 @@ export default class Rings extends Viz {
       return obj;
     }, {});
 
-    this._links = this._links.map(link => ({source: typeof link.source === "object" ? link.source : nodeLookup[link.source], target: typeof link.target === "object" ? link.target : nodeLookup[link.target]}));
+    this._links = this._links.map(link => {
+      const check = ["source", "target"];
+      return check.reduce((result, check) => {
+        const type = typeof link[check];
+        let val;
+        if (type === "number") {
+          val = nodes[link[check]];
+        }
+        else if (type === "string") {
+          val = nodeLookup[link[check]];
+        }
+        else {
+          val = link[check];
+        }
+        result[check] = val;
+        return result;
+      }, {});
+    });
 
     const linkMap = this._links.reduce((map, link) => {
       if (!map[link.source.id]) {
@@ -436,75 +455,6 @@ export default class Rings extends Viz {
         }
       });
     });
-
-    // const xExtent = extent(nodes.map(n => n.fx)),
-    //       yExtent = extent(nodes.map(n => n.fy));
-    //
-    // const x = scales.scaleLinear().domain(xExtent).range([0, width]),
-    //       y = scales.scaleLinear().domain(yExtent).range([0, height]);
-    //
-    // const nodeRatio = (xExtent[1] - xExtent[0]) / (yExtent[1] - yExtent[0]),
-    //       screenRatio = width / height;
-    //
-    // if (nodeRatio > screenRatio) {
-    //   const h = height * screenRatio / nodeRatio;
-    //   y.range([(height - h) / 2, height - (height - h) / 2]);
-    // }
-    // else {
-    //   const w = width * nodeRatio / screenRatio;
-    //   x.range([(width - w) / 2, width - (width - w) / 2]);
-    // }
-    //
-    // nodes.forEach(n => {
-    //   n.x = x(n.fx);
-    //   n.y = y(n.fy);
-    // });
-    //
-    // const rExtent = extent(nodes.map(n => n.r));
-    // let rMax = this._sizeMax || min(
-    //   merge(nodes
-    //     .map(n1 => nodes
-    //       .map(n2 => n1 === n2 ? null : shapes.pointDistance([n1.x, n1.y], [n2.x, n2.y]))
-    //     )
-    //   )
-    // ) / 2;
-    //
-    // const r = scales[`scale${this._sizeScale.charAt(0).toUpperCase()}${this._sizeScale.slice(1)}`]()
-    //             .domain(rExtent).range([rExtent[0] === rExtent[1] ? rMax : min([rMax / 2, this._sizeMin]), rMax]),
-    //       xDomain = x.domain(),
-    //       yDomain = y.domain();
-    //
-    // const xOldSize = xDomain[1] - xDomain[0],
-    //       yOldSize = yDomain[1] - yDomain[0];
-    //
-    // nodes.forEach(n => {
-    //   const size = r(n.r);
-    //   if (xDomain[0] > x.invert(n.x - size)) xDomain[0] = x.invert(n.x - size);
-    //   if (xDomain[1] < x.invert(n.x + size)) xDomain[1] = x.invert(n.x + size);
-    //   if (yDomain[0] > y.invert(n.y - size)) yDomain[0] = y.invert(n.y - size);
-    //   if (yDomain[1] < y.invert(n.y + size)) yDomain[1] = y.invert(n.y + size);
-    // });
-    //
-    // const xNewSize = xDomain[1] - xDomain[0],
-    //       yNewSize = yDomain[1] - yDomain[0];
-    //
-    // rMax *= min([xOldSize / xNewSize, yOldSize / yNewSize]);
-    // r.range([rExtent[0] === rExtent[1] ? rMax : min([rMax / 2, this._sizeMin]), rMax]);
-    // x.domain(xDomain);
-    // y.domain(yDomain);
-    //
-    // nodes.forEach(n => {
-    //   n.x = x(n.fx);
-    //   n.fx = n.x;
-    //   n.y = y(n.fy);
-    //   n.fy = n.y;
-    //   n.r = r(n.r);
-    //   n.width = n.r * 2;
-    //   n.height = n.r * 2;
-    // });
-
-    // forceSimulation(nodes)
-    //   .on("tick", () => this._shapes.forEach(s => s.render()));
 
     const nodeIndices = nodes.map(n => n.node);
     const links = this._links.map(l => ({
