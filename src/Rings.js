@@ -31,12 +31,11 @@ export default class Rings extends Viz {
     this._links = [];
     this._noDataMessage = false;
     this._nodes = [];
-    this._on["click.shape"] = (d, i) => {
-
-      this._tooltipClass.data([]).render();
-
+    this._on["mouseleave.shape"] = () => {
+      this.active(false);
+    };
+    this._on["mousemove.shape"] = (d, i) => {
       if (this._hover && this._drawDepth >= this._groupBy.length - 1) {
-
         if (this._focus && this._focus === d.id) {
 
           this.active(false);
@@ -55,8 +54,8 @@ export default class Rings extends Viz {
                 node = this._nodeLookup[id];
 
           const filterIds = [node.id];
-          let xDomain = [node.x - node.r, node.x + node.r],
-              yDomain = [node.y - node.r, node.y + node.r];
+          const xDomain = [node.x - node.r, node.x + node.r],
+                yDomain = [node.y - node.r, node.y + node.r];
 
           links.forEach(l => {
             filterIds.push(l.id);
@@ -72,15 +71,14 @@ export default class Rings extends Viz {
           });
 
           this._focus = d.id;
-          const t = zoomTransform(this._container.node());
-          xDomain = xDomain.map(d => d * t.k + t.x);
-          yDomain = yDomain.map(d => d * t.k + t.y);
-          this._zoomToBounds([[xDomain[0], yDomain[0]], [xDomain[1], yDomain[1]]]);
 
         }
 
       }
-
+    };
+    this._on["click.shape"] = (d) => {
+      this._center = d.id;
+      this._draw();
     };
     this._on["click.legend"] = (d, i) => {
 
@@ -178,7 +176,7 @@ export default class Rings extends Viz {
     }, {});
 
     const nodeIds = Array.from(new Set(this._links.reduce((ids, link) => ids.concat([link.source, link.target]), [])));
-    this._nodes = nodeIds.map(id => ({id}));
+    this._nodes = nodeIds.map(id => typeof id === "object" ? id : {id});
 
     let nodes = this._nodes.reduce((obj, d, i) => {
       obj[this._nodeGroupBy ? this._nodeGroupBy[this._drawDepth](d, i) : this._id(d, i)] = d;
@@ -210,7 +208,7 @@ export default class Rings extends Viz {
       return obj;
     }, {});
 
-    this._links = this._links.map(link => ({source: nodeLookup[link.source], target: nodeLookup[link.target]}));
+    this._links = this._links.map(link => ({source: typeof link.source === "object" ? link.source : nodeLookup[link.source], target: typeof link.target === "object" ? link.target : nodeLookup[link.target]}));
 
     const linkMap = this._links.reduce((map, link) => {
       if (!map[link.source.id]) {
@@ -236,10 +234,10 @@ export default class Rings extends Viz {
           edges = [];
 
 
-    let center = data[this._focus];
+    let center = data[this._center];
 
     if (!center) {
-      center = nodeLookup[this._focus];
+      center = nodeLookup[this._center];
     }
     
     center.x = width / 2;
@@ -247,11 +245,11 @@ export default class Rings extends Viz {
     center.r = primaryRing * .65;
 
     const primaries = [],
-          claimed = [this._focus];
+          claimed = [this._center];
 
-    linkMap[this._focus].forEach(edge => {
-      const node = edge.source.id === this._focus ? edge.target : edge.source;
-      node.edges = linkMap[node.id].filter(link => link.source.id !== this._focus || link.target.id !== this._focus);
+    linkMap[this._center].forEach(edge => {
+      const node = edge.source.id === this._center ? edge.target : edge.source;
+      node.edges = linkMap[node.id].filter(link => link.source.id !== this._center || link.target.id !== this._center);
       node.edge = edge;
 
       claimed.push(node.id);
@@ -597,8 +595,8 @@ export default class Rings extends Viz {
    @param {String}
    @chainable
    */
-  focus(_) {
-    return arguments.length ? (this._focus = _, this) : this._focus;
+  center(_) {
+    return arguments.length ? (this._center = _, this) : this._center;
   }
 
   /**
