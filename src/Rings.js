@@ -311,6 +311,7 @@ export default class Rings extends Viz {
       const space = radian / total * children;
 
       if (i === 0) {
+        start = angle;
         offset -= space / 2;
       }
 
@@ -422,10 +423,20 @@ export default class Rings extends Viz {
 
           if (target) {
             edge.spline = true;
-            edge.translate = {
-              x: width / 2,
-              y: height / 2
-            };
+
+            edge.sourceX = edge.source.x + Math.cos(edge.source.ring === 2 ? edge.source.radians + Math.PI : edge.source.radians) * edge.source.r;
+            edge.sourceY = edge.source.y + Math.sin(edge.source.ring === 2 ? edge.source.radians + Math.PI : edge.source.radians) * edge.source.r;
+            edge.targetX = edge.target.x + Math.cos(edge.target.ring === 2 ? edge.target.radians + Math.PI : edge.target.radians) * edge.target.r;
+            edge.targetY = edge.target.y + Math.sin(edge.target.ring === 2 ? edge.target.radians + Math.PI : edge.target.radians) * edge.target.r;
+
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const middleRing = (secondaryRing + primaryRing) / 1.75;
+
+            edge.sourceBisectX = centerX + middleRing * Math.cos(edge.source.radians);
+            edge.sourceBisectY = centerY + middleRing * Math.sin(edge.source.radians);
+            edge.targetBisectX = centerX + middleRing * Math.cos(edge.target.radians);
+            edge.targetBisectY = centerY + middleRing * Math.sin(edge.target.radians);
 
             const check = ["source", "target"];
 
@@ -454,6 +465,56 @@ export default class Rings extends Viz {
           }
         }
       });
+    });
+
+    nodes.forEach(node => {
+      if (node.id !== this._center) {
+        // node.rotate = node.radians * (180 / Math.PI);
+
+        let angle = node.rotate;
+        let anchor, buffer;
+        const width = ringWidth - node.r;
+        let yOffset = 0;
+
+        if (Math.round(angle) === 90 || Math.round(angle) === -90) {
+          buffer = -width / 2;
+          anchor = "start";
+          yOffset = angle > 0 ? node.r * 2 : -width + node.r;
+        }
+        else if (angle < -90 || angle > 90) {
+          angle -= 180;
+          buffer = -(node.r + width / 2);
+          anchor = "end";
+        }
+        else {
+          buffer = node.r + width / 2;
+          anchor = "start";
+        }
+
+        const height = node.ring === 1 ? primaryDistance : secondaryDistance;
+
+        node.labelBounds = {
+          x: buffer,
+          y: yOffset,
+          width,
+          height
+        };
+
+        node.labelConfig = {
+          rotate: angle,
+          textAnchor: anchor,
+          verticalAlign: "center",
+          fontResize: false
+        };
+      }
+      else {
+        node.labelBounds = {
+          x: 0,
+          y: 0,
+          width: primaryRing,
+          height: primaryRing - node.r * 2
+        };
+      }
     });
 
     const nodeIndices = nodes.map(n => n.node);
@@ -512,11 +573,11 @@ export default class Rings extends Viz {
     const parent = this._zoomGroup = this._zoomGroup.enter().append("g")
         .attr("class", "d3plus-network-zoomGroup")
       .merge(this._zoomGroup);
-
+    
     this._shapes.push(new shapes.Path()
       .config(this._shapeConfig)
       .config(this._shapeConfig.Path)
-      .d(d => `M${d.source.x},${d.source.y} ${d.target.x},${d.target.y}`)
+      .d(d => d.spline ? `M${d.sourceX},${d.sourceY}C${d.sourceBisectX},${d.sourceBisectY} ${d.targetBisectX},${d.targetBisectY} ${d.targetX},${d.targetY}` : `M${d.source.x},${d.source.y} ${d.target.x},${d.target.y}`)
       .data(edges)
       .select(elem("g.d3plus-network-links", {parent, transition, enter: {transform}, update: {transform}}).node())
       .render());
