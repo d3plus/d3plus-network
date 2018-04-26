@@ -3,7 +3,7 @@
     @see https://github.com/d3plus/d3plus-viz#Viz
 */
 
-import {extent, mean, min, merge} from "d3-array";
+import {extent, max, mean, min, merge} from "d3-array";
 import {nest} from "d3-collection";
 import * as scales from "d3-scale";
 import {zoomTransform} from "d3-zoom";
@@ -11,6 +11,7 @@ import {zoomTransform} from "d3-zoom";
 import {accessor, assign, configPrep, constant, elem} from "d3plus-common";
 import * as shapes from "d3plus-shape";
 import {dataLoad as load, Viz} from "d3plus-viz";
+import {textWrap} from "d3plus-text";
 
 /**
     @class Rings
@@ -205,7 +206,7 @@ export default class Rings extends Viz {
 
     }).filter(n => n);
 
-    const nodeLookup = this._nodeLookup = nodes.reduce((obj, d) => {
+    let nodeLookup = this._nodeLookup = nodes.reduce((obj, d) => {
       obj[d.id] = d;
       return obj;
     }, {});
@@ -468,51 +469,70 @@ export default class Rings extends Viz {
     });
 
     nodes.forEach(node => {
+
       if (node.id !== this._center) {
-        // node.rotate = node.radians * (180 / Math.PI);
+        node.rotate = node.radians * (180 / Math.PI);
+
+        const fontSize = 11;
+
+        const wrap = textWrap()
+          .fontSize(fontSize);
+
+        const res = wrap(this._drawLabel(node));
+        const containerWidth = max(res.widths) * 2;
+        const containerHeight = res.lines.length * 1.4 * fontSize * 2;
+        const width = containerWidth / 2;
+        const height = containerHeight / 2;
+        const padding = 15;
 
         let angle = node.rotate;
         let anchor, buffer;
-        const width = ringWidth - node.r;
         let yOffset = 0;
 
         if (Math.round(angle) === 90 || Math.round(angle) === -90) {
-          buffer = -width / 2;
-          anchor = "start";
-          yOffset = angle > 0 ? node.r * 2 : -width + node.r;
-        }
-        else if (angle < -90 || angle > 90) {
-          angle -= 180;
-          buffer = -(node.r + width / 2);
+          const xVal = Math.cos(node.radians + Math.PI) * (node.r + padding);
+          const yVal = Math.sin(node.radians + Math.PI) * (node.r + padding);
+
+          buffer = angle < 0 ? -width - xVal + (height / 6) : -width - xVal - (height / 6);
+          yOffset = -node.r - yVal;
           anchor = "end";
         }
-        else {
-          buffer = node.r + width / 2;
+        else if (angle < -90 || angle > 90) {
+          const xVal = Math.cos(node.radians + Math.PI) * (node.r + padding);
+          const yVal = Math.sin(node.radians + Math.PI) * (node.r + padding);
+
+          yOffset = -node.r - yVal;
+          buffer = -width - xVal;
+          angle -= 180;
           anchor = "start";
         }
+        else {
+          const xVal = Math.cos(node.radians + Math.PI) * (node.r + padding);
+          const yVal = Math.sin(node.radians + Math.PI) * (node.r + padding);
 
-        const height = node.ring === 1 ? primaryDistance : secondaryDistance;
+          buffer = -width - xVal;
+          yOffset = -node.r - yVal;
+          anchor = "end";
+        }
 
         node.labelBounds = {
           x: buffer,
           y: yOffset,
-          width,
-          height
+          width: containerWidth,
+          height: containerHeight
         };
 
-        node.labelConfig = {
-          rotate: angle,
-          textAnchor: anchor,
-          verticalAlign: "center",
-          fontResize: false
-        };
+        node.rotate = angle;
+        node.fontColor = "#000";
+        node.fontSize = fontSize;
+        node.textAnchor = anchor;
       }
       else {
         node.labelBounds = {
-          x: 0,
-          y: 0,
+          x: -primaryRing / 2,
+          y: -primaryRing / 2,
           width: primaryRing,
-          height: primaryRing - node.r * 2
+          height: primaryRing
         };
       }
     });
@@ -532,6 +552,11 @@ export default class Rings extends Viz {
       obj[d.source.id].push(d.target);
       if (!obj[d.target.id]) obj[d.target.id] = [];
       obj[d.target.id].push(d.source);
+      return obj;
+    }, {});
+
+    nodeLookup = this._nodeLookup = nodes.reduce((obj, d) => {
+      obj[d.id] = d;
       return obj;
     }, {});
 
@@ -582,9 +607,23 @@ export default class Rings extends Viz {
       .select(elem("g.d3plus-network-links", {parent, transition, enter: {transform}, update: {transform}}).node())
       .render());
 
+    const that = this;
+
     const shapeConfig = {
       label: d => nodes.length <= this._labelCutoff || (this._hover && this._hover(d) || this._active && this._active(d)) ? this._drawLabel(d.data || d.node, d.i) : false,
-      select: elem("g.d3plus-network-nodes", {parent, transition, enter: {transform}, update: {transform}}).node()
+      select: elem("g.d3plus-network-nodes", {parent, transition, enter: {transform}, update: {transform}}).node(),
+      labelBounds: d => d.labelBounds,
+      fill: "transparent",
+      stroke: "black",
+      strokeWidth: 1,
+      labelConfig: {
+        rotate: d => nodeLookup[d.data.data.id].rotate || 0,
+        fontColor: d => nodeLookup[d.data.data.id].fontColor ? configPrep.bind(that)(that._shapeConfig, "shape", d.key).fill(d) : configPrep.bind(that)(that._shapeConfig, "shape", d.key).labelConfig.fontColor(d),
+        fontSize: d => nodeLookup[d.data.data.id].fontSize || configPrep.bind(that)(that._shapeConfig, "shape", d.key).labelConfig.fontSize,
+        fontResize: d => d.data.data.id === this._center,
+        textAnchor: d => nodeLookup[d.data.data.id].textAnchor || configPrep.bind(that)(that._shapeConfig, "shape", d.key).labelConfig.textAnchor,
+        verticalAlign: "middle"
+      }
     };
 
     nest().key(d => d.shape).entries(nodes).forEach(d => {
