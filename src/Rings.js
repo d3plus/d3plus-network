@@ -138,7 +138,6 @@ export default class Rings extends Viz {
       }
 
     };
-    this._sizeMin = 5;
     this._sizeScale = "sqrt";
     this._shape = constant("Circle");
     this._shapeConfig = assign(this._shapeConfig, {
@@ -264,7 +263,7 @@ export default class Rings extends Viz {
     
     center.x = width / 2;
     center.y = height / 2;
-    center.r = primaryRing * .65;
+    center.r = this._sizeMin ? max([this._sizeMin, primaryRing * .65]) : this._sizeMax ? min([this._sizeMax, primaryRing * .65]) : primaryRing * .65;
 
     const claimed = [this._center],
           primaries = [];
@@ -384,13 +383,13 @@ export default class Rings extends Viz {
     secondaries.forEach(s => {
       s.ring = 2;
       const val = this._size ? s.size : 2;
-      s.r = radiusFn(val);
+      s.r = this._sizeMin ? max([this._sizeMin, radiusFn(val)]) : this._sizeMax ? min([this._sizeMax, radiusFn(val)]) : radiusFn(val);
     });
 
     primaries.forEach(p => {
       p.ring = 1;
       const val = this._size ? p.size : 1;
-      p.r = radiusFn(val);
+      p.r = this._sizeMin ? max([this._sizeMin, radiusFn(val)]) : this._sizeMax ? min([this._sizeMax, radiusFn(val)]) : radiusFn(val);
     });
 
     nodes = [center].concat(primaries).concat(secondaries);
