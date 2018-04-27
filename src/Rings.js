@@ -276,16 +276,8 @@ export default class Rings extends Viz {
       primaries.push(node);
     });
 
-    // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    // Sort primary nodes by children (smallest to largest) and then by sort
-    // order.
-    // --------------------------------------------------------------------------
     primaries.sort((a, b) => a.edges.length - b.edges.length);
-
-    // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    // Check for similar children and give preference to nodes with less
-    // overall children.
-    // ----------------------------------------------------------------------------
+    
     const secondaries = [];
     let total = 0;
 
