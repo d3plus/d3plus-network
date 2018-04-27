@@ -3,7 +3,7 @@
     @see https://github.com/d3plus/d3plus-viz#Viz
 */
 
-import {extent, max, mean, min} from "d3-array";
+import {extent, max, min} from "d3-array";
 import {nest} from "d3-collection";
 import * as scales from "d3-scale";
 import {zoomTransform} from "d3-zoom";
@@ -612,22 +612,12 @@ export default class Rings extends Viz {
 
   /**
    @memberof Rings
-   @desc Sets the center node.
+   @desc Sets the center node to be the node with the given id.
    @param {String}
    @chainable
    */
   center(_) {
     return arguments.length ? (this._center = _, this) : this._center;
-  }
-
-  /**
-      @memberof Rings
-      @desc Defines the maximum number of nodes that allow all labels to be shown. When the number of nodes is over this amount, labels will only be shown on hover and click.
-      @param {Number} *value* = 100
-      @chainable
-  */
-  labelCutoff(_) {
-    return arguments.length ? (this._labelCutoff = _, this) : this._labelCutoff;
   }
 
   /**
@@ -734,42 +724,6 @@ Additionally, a custom formatting function can be passed as a second argument to
   */
   sizeScale(_) {
     return arguments.length ? (this._sizeScale = _, this) : this._sizeScale;
-  }
-
-  /**
-      @memberof Rings
-      @desc If *value* is specified, sets the x accessor to the specified function or string matching a key in the data and returns the current class instance. The data passed to .data() takes priority over the .nodes() data array. If *value* is not specified, returns the current x accessor. By default, the x and y positions are determined dynamically based on default force layout properties.
-      @param {Function|String} [*value*]
-      @chainable
-  */
-  x(_) {
-    if (arguments.length) {
-      if (typeof _ === "function") this._x = _;
-      else {
-        this._x = accessor(_);
-        if (!this._aggs[_]) this._aggs[_] = a => mean(a);
-      }
-      return this;
-    }
-    else return this._x;
-  }
-
-  /**
-      @memberof Rings
-      @desc If *value* is specified, sets the y accessor to the specified function or string matching a key in the data and returns the current class instance. The data passed to .data() takes priority over the .nodes() data array. If *value* is not specified, returns the current y accessor. By default, the x and y positions are determined dynamically based on default force layout properties.
-      @param {Function|String} [*value*]
-      @chainable
-  */
-  y(_) {
-    if (arguments.length) {
-      if (typeof _ === "function") this._y = _;
-      else {
-        this._y = accessor(_);
-        if (!this._aggs[_]) this._aggs[_] = a => mean(a);
-      }
-      return this;
-    }
-    else return this._y;
   }
 
 }
