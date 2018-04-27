@@ -3,7 +3,7 @@
     @see https://github.com/d3plus/d3plus-viz#Viz
 */
 
-import {extent, max, mean, min, merge} from "d3-array";
+import {extent, max, mean, min} from "d3-array";
 import {nest} from "d3-collection";
 import * as scales from "d3-scale";
 import {zoomTransform} from "d3-zoom";
@@ -613,16 +613,12 @@ export default class Rings extends Viz {
       label: d => nodes.length <= this._labelCutoff || (this._hover && this._hover(d) || this._active && this._active(d)) ? this._drawLabel(d.data || d.node, d.i) : false,
       select: elem("g.d3plus-network-nodes", {parent, transition, enter: {transform}, update: {transform}}).node(),
       labelBounds: d => d.labelBounds,
-      fill: "transparent",
-      stroke: "black",
-      strokeWidth: 1,
       labelConfig: {
         rotate: d => nodeLookup[d.data.data.id].rotate || 0,
         fontColor: d => nodeLookup[d.data.data.id].fontColor ? configPrep.bind(that)(that._shapeConfig, "shape", d.key).fill(d) : configPrep.bind(that)(that._shapeConfig, "shape", d.key).labelConfig.fontColor(d),
         fontSize: d => nodeLookup[d.data.data.id].fontSize || configPrep.bind(that)(that._shapeConfig, "shape", d.key).labelConfig.fontSize,
         fontResize: d => d.data.data.id === this._center,
-        textAnchor: d => nodeLookup[d.data.data.id].textAnchor || configPrep.bind(that)(that._shapeConfig, "shape", d.key).labelConfig.textAnchor,
-        verticalAlign: "middle"
+        textAnchor: d => nodeLookup[d.data.data.id].textAnchor || configPrep.bind(that)(that._shapeConfig, "shape", d.key).labelConfig.textAnchor
       }
     };
 
@@ -650,7 +646,7 @@ export default class Rings extends Viz {
   }
 
   /**
-      @memberof Network
+      @memberof Rings
       @desc Defines the maximum number of nodes that allow all labels to be shown. When the number of nodes is over this amount, labels will only be shown on hover and click.
       @param {Number} *value* = 100
       @chainable
@@ -660,8 +656,8 @@ export default class Rings extends Viz {
   }
 
   /**
-      @memberof Network
-      @desc A predefined *Array* of edges that connect each object passed to the [node](#Network.node) method. The `source` and `target` keys in each link need to map to the nodes in one of three ways:
+      @memberof Rings
+      @desc A predefined *Array* of edges that connect each object passed to the [node](#Rings.node) method. The `source` and `target` keys in each link need to map to the nodes in one of three ways:
 1. The index of the node in the nodes array (as in [this](http://d3plus.org/examples/d3plus-network/getting-started/) example).
 2. The actual node *Object* itself.
 3. A *String* value matching the `id` of the node.
@@ -683,7 +679,7 @@ The value passed should either be an *Array* of data or a *String* representing 
   }
 
   /**
-      @memberof Network
+      @memberof Rings
       @desc If *value* is specified, sets the node group accessor(s) to the specified string, function, or array of values and returns the current class instance. This method overrides the default .groupBy() function from being used with the data passed to .nodes(). If *value* is not specified, returns the current node group accessor.
       @param {String|Function|Array} [*value* = undefined]
       @chainable
@@ -706,8 +702,8 @@ The value passed should either be an *Array* of data or a *String* representing 
   }
 
   /**
-      @memberof Network
-      @desc The list of nodes to be used for drawing the network. The value passed should either be an *Array* of data or a *String* representing a filepath or URL to be loaded.
+      @memberof Rings
+      @desc The list of nodes to be used for drawing the rings network. The value passed should either be an *Array* of data or a *String* representing a filepath or URL to be loaded.
 
 Additionally, a custom formatting function can be passed as a second argument to this method. This custom function will be passed the data that has been loaded, as long as there are no errors. This function should return the final node *Array*.
       @param {Array|String} *nodes* = []
@@ -726,7 +722,7 @@ Additionally, a custom formatting function can be passed as a second argument to
   }
 
   /**
-      @memberof Network
+      @memberof Rings
       @desc If *value* is specified, sets the size accessor to the specified function or data key and returns the current class instance. If *value* is not specified, returns the current size accessor.
       @param {Function|String} [*value*]
       @chainable
@@ -736,7 +732,7 @@ Additionally, a custom formatting function can be passed as a second argument to
   }
 
   /**
-      @memberof Network
+      @memberof Rings
       @desc If *value* is specified, sets the size scale maximum to the specified number and returns the current class instance. If *value* is not specified, returns the current size scale maximum. By default, the maximum size is determined by half the distance of the two closest nodes.
       @param {Number} [*value*]
       @chainable
@@ -746,7 +742,7 @@ Additionally, a custom formatting function can be passed as a second argument to
   }
 
   /**
-      @memberof Network
+      @memberof Rings
       @desc If *value* is specified, sets the size scale minimum to the specified number and returns the current class instance. If *value* is not specified, returns the current size scale minimum.
       @param {Number} [*value* = 5]
       @chainable
@@ -756,7 +752,7 @@ Additionally, a custom formatting function can be passed as a second argument to
   }
 
   /**
-      @memberof Network
+      @memberof Rings
       @desc If *value* is specified, sets the size scale to the specified string and returns the current class instance. If *value* is not specified, returns the current size scale.
       @param {String} [*value* = "sqrt"]
       @chainable
@@ -766,7 +762,7 @@ Additionally, a custom formatting function can be passed as a second argument to
   }
 
   /**
-      @memberof Network
+      @memberof Rings
       @desc If *value* is specified, sets the x accessor to the specified function or string matching a key in the data and returns the current class instance. The data passed to .data() takes priority over the .nodes() data array. If *value* is not specified, returns the current x accessor. By default, the x and y positions are determined dynamically based on default force layout properties.
       @param {Function|String} [*value*]
       @chainable
@@ -784,7 +780,7 @@ Additionally, a custom formatting function can be passed as a second argument to
   }
 
   /**
-      @memberof Network
+      @memberof Rings
       @desc If *value* is specified, sets the y accessor to the specified function or string matching a key in the data and returns the current class instance. The data passed to .data() takes priority over the .nodes() data array. If *value* is not specified, returns the current y accessor. By default, the x and y positions are determined dynamically based on default force layout properties.
       @param {Function|String} [*value*]
       @chainable
