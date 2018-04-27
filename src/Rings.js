@@ -9,6 +9,7 @@ import * as scales from "d3-scale";
 import {zoomTransform} from "d3-zoom";
 
 import {accessor, assign, configPrep, constant, elem} from "d3plus-common";
+import {colorLegible} from "d3plus-color";
 import * as shapes from "d3plus-shape";
 import {dataLoad as load, Viz} from "d3plus-viz";
 import {textWrap} from "d3plus-text";
@@ -247,11 +248,12 @@ export default class Rings extends Viz {
           transition = this._transition,
           width = this._width - this._margin.left - this._margin.right;
 
-    const radius = min([height, width]) / 2,
-          ringWidth = radius / 3,
-          primaryRing = ringWidth,
-          secondaryRing = ringWidth * 2,
-          edges = [];
+    const edges = [],
+          radius = min([height, width]) / 2,
+          ringWidth = radius / 3;
+
+    const primaryRing = ringWidth,
+          secondaryRing = ringWidth * 2;
 
 
     let center = data[this._center];
@@ -264,8 +266,8 @@ export default class Rings extends Viz {
     center.y = height / 2;
     center.r = primaryRing * .65;
 
-    const primaries = [],
-          claimed = [this._center];
+    const claimed = [this._center],
+          primaries = [];
 
     linkMap[this._center].forEach(edge => {
       const node = edge.source.id === this._center ? edge.target : edge.source;
@@ -297,14 +299,13 @@ export default class Rings extends Viz {
     });
 
     const radian = Math.PI * 2;
-    let offset = 0, start = 0;
+    let offset = 0;
 
     primaries.forEach((p, i) => {
       const children = p.edges.length || 1;
       const space = radian / total * children;
 
       if (i === 0) {
-        start = angle;
         offset -= space / 2;
       }
 
@@ -575,6 +576,7 @@ export default class Rings extends Viz {
     this._shapes.push(new shapes.Path()
       .config(this._shapeConfig)
       .config(this._shapeConfig.Path)
+      .id(d => `${d.source.id}_${d.target.id}`)
       .d(d => d.spline ? `M${d.sourceX},${d.sourceY}C${d.sourceBisectX},${d.sourceBisectY} ${d.targetBisectX},${d.targetBisectY} ${d.targetX},${d.targetY}` : `M${d.source.x},${d.source.y} ${d.target.x},${d.target.y}`)
       .data(edges)
       .select(elem("g.d3plus-network-links", {parent, transition, enter: {transform}, update: {transform}}).node())
@@ -588,7 +590,7 @@ export default class Rings extends Viz {
       labelBounds: d => d.labelBounds,
       labelConfig: {
         rotate: d => nodeLookup[d.data.data.id].rotate || 0,
-        fontColor: d => nodeLookup[d.data.data.id].fontColor ? configPrep.bind(that)(that._shapeConfig, "shape", d.key).fill(d) : configPrep.bind(that)(that._shapeConfig, "shape", d.key).labelConfig.fontColor(d),
+        fontColor: d => nodeLookup[d.data.data.id].fontColor ? colorLegible(configPrep.bind(that)(that._shapeConfig, "shape", d.key).fill(d)) : configPrep.bind(that)(that._shapeConfig, "shape", d.key).labelConfig.fontColor(d),
         fontSize: d => nodeLookup[d.data.data.id].fontSize || configPrep.bind(that)(that._shapeConfig, "shape", d.key).labelConfig.fontSize,
         fontResize: d => d.data.data.id === this._center,
         textAnchor: d => nodeLookup[d.data.data.id].textAnchor || configPrep.bind(that)(that._shapeConfig, "shape", d.key).labelConfig.textAnchor
