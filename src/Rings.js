@@ -277,7 +277,7 @@ export default class Rings extends Viz {
     });
 
     primaries.sort((a, b) => a.edges.length - b.edges.length);
-    
+
     const secondaries = [];
     let total = 0;
 
@@ -417,23 +417,18 @@ export default class Rings extends Viz {
           if (target) {
             edge.spline = true;
 
-            edge.sourceX = edge.source.x + Math.cos(edge.source.ring === 2 ? edge.source.radians + Math.PI : edge.source.radians) * edge.source.r;
-            edge.sourceY = edge.source.y + Math.sin(edge.source.ring === 2 ? edge.source.radians + Math.PI : edge.source.radians) * edge.source.r;
-            edge.targetX = edge.target.x + Math.cos(edge.target.ring === 2 ? edge.target.radians + Math.PI : edge.target.radians) * edge.target.r;
-            edge.targetY = edge.target.y + Math.sin(edge.target.ring === 2 ? edge.target.radians + Math.PI : edge.target.radians) * edge.target.r;
-
             const centerX = width / 2;
             const centerY = height / 2;
             const middleRing = (secondaryRing + primaryRing) / 1.75;
 
-            edge.sourceBisectX = centerX + middleRing * Math.cos(edge.source.radians);
-            edge.sourceBisectY = centerY + middleRing * Math.sin(edge.source.radians);
-            edge.targetBisectX = centerX + middleRing * Math.cos(edge.target.radians);
-            edge.targetBisectY = centerY + middleRing * Math.sin(edge.target.radians);
-
             const check = ["source", "target"];
 
             check.forEach((node, i) => {
+              edge[`${node}X`] = edge[node].x + Math.cos(edge[node].ring === 2 ? edge[node].radians + Math.PI : edge[node].radians) * edge[node].r;
+              edge[`${node}Y`] = edge[node].y + Math.sin(edge[node].ring === 2 ? edge[node].radians + Math.PI : edge[node].radians) * edge[node].r;
+              edge[`${node}BisectX`] = centerX + middleRing * Math.cos(edge[node].radians);
+              edge[`${node}BisectY`] = centerY + middleRing * Math.sin(edge[node].radians);
+
               edge[node] = nodes.find(n => n.id === edge[node].id);
 
               if (edge[node].edges === undefined) edge[node].edges = {};
