@@ -473,7 +473,7 @@ export default class Rings extends Viz {
       if (node.id !== this._center) {
         node.rotate = node.radians * (180 / Math.PI);
 
-        const fontSize = 11;
+        const fontSize = this._shapeConfig.labelConfig.fontSize && this._shapeConfig.labelConfig.fontSize(node) || 11;
 
         const wrap = textWrap()
           .fontSize(fontSize);
@@ -486,33 +486,19 @@ export default class Rings extends Viz {
         const padding = 15;
 
         let angle = node.rotate;
-        let anchor, buffer;
-        let yOffset = 0;
+
+        const xVal = Math.cos(node.radians + Math.PI) * (node.r + padding);
+        const yVal = Math.sin(node.radians + Math.PI) * (node.r + padding);
+        const yOffset = node.ring === 1 ? -node.r - yVal + height / 2 : -node.r - yVal + height / 6;
+        let buffer = -width - xVal;
+        let anchor = "end";
 
         if (Math.round(angle) === 90 || Math.round(angle) === -90) {
-          const xVal = Math.cos(node.radians + Math.PI) * (node.r + padding);
-          const yVal = Math.sin(node.radians + Math.PI) * (node.r + padding);
-
-          buffer = angle < 0 ? -width - xVal + (height / 6) : -width - xVal - (height / 6);
-          yOffset = -node.r - yVal;
-          anchor = "end";
+          angle < 0 ? buffer += height / 6 : buffer -= height / 6;
         }
         else if (angle < -90 || angle > 90) {
-          const xVal = Math.cos(node.radians + Math.PI) * (node.r + padding);
-          const yVal = Math.sin(node.radians + Math.PI) * (node.r + padding);
-
-          yOffset = -node.r - yVal;
-          buffer = -width - xVal;
           angle -= 180;
           anchor = "start";
-        }
-        else {
-          const xVal = Math.cos(node.radians + Math.PI) * (node.r + padding);
-          const yVal = Math.sin(node.radians + Math.PI) * (node.r + padding);
-
-          buffer = -width - xVal;
-          yOffset = -node.r - yVal;
-          anchor = "end";
         }
 
         node.labelBounds = {
