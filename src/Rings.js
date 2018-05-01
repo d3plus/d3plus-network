@@ -183,13 +183,12 @@ export default class Rings extends Viz {
         data: d || n,
         i, id,
         node: n,
-        r: this._size ? d !== undefined && this._size(d) !== undefined ? this._size(d) : this._size(n) : this._sizeMin,
         shape: d !== undefined && this._shape(d) !== undefined ? this._shape(d) : this._shape(n)
       };
 
     }).filter(n => n);
 
-    let nodeLookup = this._nodeLookup = nodes.reduce((obj, d) => {
+    const nodeLookup = this._nodeLookup = nodes.reduce((obj, d) => {
       obj[d.id] = d;
       return obj;
     }, {});
@@ -275,7 +274,7 @@ export default class Rings extends Viz {
         offset -= space / 2;
       }
 
-      let angle = (offset + space / 2) - tau / 4;
+      const angle = offset + space / 2 - tau / 4;
 
       p.radians = angle;
       p.x = width / 2 + primaryRing * Math.cos(angle);
@@ -480,11 +479,6 @@ export default class Rings extends Viz {
       obj[d.source.id].push(d.target);
       if (!obj[d.target.id]) obj[d.target.id] = [];
       obj[d.target.id].push(d.source);
-      return obj;
-    }, {});
-
-    nodeLookup = this._nodeLookup = nodes.reduce((obj, d) => {
-      obj[d.id] = d;
       return obj;
     }, {});
 
