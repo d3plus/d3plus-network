@@ -44,8 +44,6 @@ export default class Rings extends Viz {
           this._on.mouseenter.bind(this)(d, i);
 
           this._focus = undefined;
-          this._zoomToBounds(null);
-
         }
         else {
 
@@ -96,8 +94,6 @@ export default class Rings extends Viz {
           this._on.mouseenter.bind(this)(d, i);
 
           this._focus = undefined;
-          this._zoomToBounds(null);
-
         }
         else {
 
@@ -106,15 +102,9 @@ export default class Rings extends Viz {
           const nodes = ids.map(id => this._nodeLookup[id]);
 
           const filterIds = [id];
-          let xDomain = [nodes[0].x - nodes[0].r, nodes[0].x + nodes[0].r],
-              yDomain = [nodes[0].y - nodes[0].r, nodes[0].y + nodes[0].r];
 
           nodes.forEach(l => {
             filterIds.push(l.id);
-            if (l.x - l.r < xDomain[0]) xDomain[0] = l.x - l.r;
-            if (l.x + l.r > xDomain[1]) xDomain[1] = l.x + l.r;
-            if (l.y - l.r < yDomain[0]) yDomain[0] = l.y - l.r;
-            if (l.y + l.r > yDomain[1]) yDomain[1] = l.y + l.r;
           });
 
           this.active((h, x) => {
@@ -126,11 +116,6 @@ export default class Rings extends Viz {
           });
 
           this._focus = ids;
-          const t = zoomTransform(this._container.node());
-          xDomain = xDomain.map(d => d * t.k + t.x);
-          yDomain = yDomain.map(d => d * t.k + t.y);
-          this._zoomToBounds([[xDomain[0], yDomain[0]], [xDomain[1], yDomain[1]]]);
-
         }
 
         this._on["mousemove.legend"].bind(this)(d, i);
@@ -551,26 +536,6 @@ export default class Rings extends Viz {
       .attr("height", height)
       .attr("x", this._margin.left)
       .attr("y", this._margin.top);
-
-    const hitArea = this._container.selectAll("rect.d3plus-network-hitArea").data([0]);
-    hitArea.enter().append("rect")
-        .attr("class", "d3plus-network-hitArea")
-      .merge(hitArea)
-        .attr("width", width)
-        .attr("height", height)
-        .attr("fill", "transparent")
-        .on("click", () => {
-          if (this._focus) {
-            this.active(false);
-            this._focus = undefined;
-            this._zoomToBounds(null);
-          }
-        });
-
-    this._zoomGroup = this._container.selectAll("g.d3plus-network-zoomGroup").data([0]);
-    const parent = this._zoomGroup = this._zoomGroup.enter().append("g")
-        .attr("class", "d3plus-network-zoomGroup")
-      .merge(this._zoomGroup);
     
     this._shapes.push(new shapes.Path()
       .config(this._shapeConfig)
@@ -578,14 +543,14 @@ export default class Rings extends Viz {
       .id(d => `${d.source.id}_${d.target.id}`)
       .d(d => d.spline ? `M${d.sourceX},${d.sourceY}C${d.sourceBisectX},${d.sourceBisectY} ${d.targetBisectX},${d.targetBisectY} ${d.targetX},${d.targetY}` : `M${d.source.x},${d.source.y} ${d.target.x},${d.target.y}`)
       .data(edges)
-      .select(elem("g.d3plus-network-links", {parent, transition, enter: {transform}, update: {transform}}).node())
+      .select(elem("g.d3plus-network-links", {parent: this._container, transition, enter: {transform}, update: {transform}}).node())
       .render());
 
     const that = this;
 
     const shapeConfig = {
       label: d => nodes.length <= this._labelCutoff || (this._hover && this._hover(d) || this._active && this._active(d)) ? this._drawLabel(d.data || d.node, d.i) : false,
-      select: elem("g.d3plus-network-nodes", {parent, transition, enter: {transform}, update: {transform}}).node(),
+      select: elem("g.d3plus-network-nodes", {parent: this._container, transition, enter: {transform}, update: {transform}}).node(),
       labelBounds: d => d.labelBounds,
       labelConfig: {
         rotate: d => nodeLookup[d.data.data.id].rotate || 0,
