@@ -6,7 +6,6 @@
 import {extent, max, min} from "d3-array";
 import {nest} from "d3-collection";
 import * as scales from "d3-scale";
-import {zoomTransform} from "d3-zoom";
 
 import {accessor, assign, configPrep, constant, elem} from "d3plus-common";
 import {colorLegible} from "d3plus-color";
