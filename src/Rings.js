@@ -122,6 +122,7 @@ export default class Rings extends Viz {
       }
 
     };
+    this._sizeMin = 5;
     this._sizeScale = "sqrt";
     this._shape = constant("Circle");
     this._shapeConfig = assign(this._shapeConfig, {
