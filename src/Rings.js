@@ -502,8 +502,7 @@ export default class Rings extends Viz {
       .attr("y", this._margin.top);
     
     this._shapes.push(new shapes.Path()
-      .config(this._shapeConfig)
-      .config(this._shapeConfig.Path)
+      .config(configPrep.bind(this)(this._shapeConfig, "edge", "Path"))
       .id(d => `${d.source.id}_${d.target.id}`)
       .d(d => d.spline ? `M${d.sourceX},${d.sourceY}C${d.sourceBisectX},${d.sourceBisectY} ${d.targetBisectX},${d.targetBisectY} ${d.targetX},${d.targetY}` : `M${d.source.x},${d.source.y} ${d.target.x},${d.target.y}`)
       .data(edges)
@@ -529,7 +528,6 @@ export default class Rings extends Viz {
       this._shapes.push(new shapes[d.key]()
         .config(configPrep.bind(this)(this._shapeConfig, "shape", d.key))
         .config(shapeConfig)
-        .config(shapeConfig[d.key] || {})
         .data(d.values)
         .render());
     });
