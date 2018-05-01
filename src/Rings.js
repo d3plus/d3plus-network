@@ -274,9 +274,7 @@ export default class Rings extends Viz {
         offset -= space / 2;
       }
 
-      let angle = offset + space / 2;
-
-      angle -= tau / 4;
+      let angle = (offset + space / 2) - tau / 4;
 
       p.radians = angle;
       p.x = width / 2 + primaryRing * Math.cos(angle);
