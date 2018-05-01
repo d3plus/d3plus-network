@@ -263,12 +263,12 @@ export default class Rings extends Viz {
       });
     });
 
-    const radian = Math.PI * 2;
+    const tau = Math.PI * 2;
     let offset = 0;
 
     primaries.forEach((p, i) => {
       const children = p.edges.length || 1;
-      const space = radian / totalEndNodes * children;
+      const space = tau / totalEndNodes * children;
 
       if (i === 0) {
         offset -= space / 2;
@@ -276,7 +276,7 @@ export default class Rings extends Viz {
 
       let angle = offset + space / 2;
 
-      angle -= radian / 4;
+      angle -= tau / 4;
 
       p.radians = angle;
       p.x = width / 2 + primaryRing * Math.cos(angle);
@@ -286,7 +286,7 @@ export default class Rings extends Viz {
 
       p.edges.forEach((edge, i) => {
         const node = edge.source.id === p.id ? edge.target : edge.source;
-        const s = radian / totalEndNodes;
+        const s = tau / totalEndNodes;
         const a = angle - s * children / 2 + s / 2 + s * i;
 
         node.radians = a;
