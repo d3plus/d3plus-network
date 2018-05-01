@@ -246,7 +246,7 @@ export default class Rings extends Viz {
     primaries.sort((a, b) => a.edges.length - b.edges.length);
 
     const secondaries = [];
-    let total = 0;
+    let totalEndNodes = 0;
 
     primaries.forEach(p => {
       const primaryId = p.id;
@@ -254,7 +254,7 @@ export default class Rings extends Viz {
       p.edges = p.edges.filter(edge => !claimed.includes(edge.source) && edge.target.id === primaryId ||
                                        !claimed.includes(edge.target) && edge.source.id === primaryId);
 
-      total += p.edges.length || 1;
+      totalEndNodes += p.edges.length || 1;
 
       p.edges.forEach(edge => {
         const {source, target} = edge;
@@ -268,7 +268,7 @@ export default class Rings extends Viz {
 
     primaries.forEach((p, i) => {
       const children = p.edges.length || 1;
-      const space = radian / total * children;
+      const space = radian / totalEndNodes * children;
 
       if (i === 0) {
         offset -= space / 2;
@@ -286,7 +286,7 @@ export default class Rings extends Viz {
 
       p.edges.forEach((edge, i) => {
         const node = edge.source.id === p.id ? edge.target : edge.source;
-        const s = radian / total;
+        const s = radian / totalEndNodes;
         const a = angle - s * children / 2 + s / 2 + s * i;
 
         node.radians = a;
