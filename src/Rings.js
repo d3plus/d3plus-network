@@ -225,18 +225,13 @@ export default class Rings extends Viz {
     const primaryRing = ringWidth,
           secondaryRing = ringWidth * 2;
 
-
-    let center = data[this._center];
-
-    if (!center) {
-      center = nodeLookup[this._center];
-    }
+    const center = nodeLookup[this._center];
     
     center.x = width / 2;
     center.y = height / 2;
     center.r = this._sizeMin ? max([this._sizeMin, primaryRing * .65]) : this._sizeMax ? min([this._sizeMax, primaryRing * .65]) : primaryRing * .65;
 
-    const claimed = [this._center],
+    const claimed = [center],
           primaries = [];
 
     linkMap[this._center].forEach(edge => {
@@ -244,7 +239,7 @@ export default class Rings extends Viz {
       node.edges = linkMap[node.id].filter(link => link.source.id !== this._center || link.target.id !== this._center);
       node.edge = edge;
 
-      claimed.push(node.id);
+      claimed.push(node);
       primaries.push(node);
     });
 
@@ -256,15 +251,15 @@ export default class Rings extends Viz {
     primaries.forEach(p => {
       const primaryId = p.id;
 
-      p.edges = p.edges.filter(edge => !claimed.includes(edge.source.id) && edge.target.id === primaryId ||
-                                       !claimed.includes(edge.target.id) && edge.source.id === primaryId);
+      p.edges = p.edges.filter(edge => !claimed.includes(edge.source) && edge.target.id === primaryId ||
+                                       !claimed.includes(edge.target) && edge.source.id === primaryId);
 
       total += p.edges.length || 1;
 
       p.edges.forEach(edge => {
         const {source, target} = edge;
         const claim = target.id === primaryId ? source : target;
-        claimed.push(claim.id);
+        claimed.push(claim);
       });
     });
 
