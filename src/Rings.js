@@ -482,10 +482,10 @@ export default class Rings extends Viz {
       return obj;
     }, {});
 
-    this._container = this._select.selectAll("svg.d3plus-network").data([0]);
+    this._container = this._select.selectAll("svg.d3plus-rings").data([0]);
 
     this._container = this._container.enter().append("svg")
-        .attr("class", "d3plus-network")
+        .attr("class", "d3plus-rings")
         .attr("opacity", 0)
         .attr("width", width)
         .attr("height", height)
@@ -507,14 +507,14 @@ export default class Rings extends Viz {
       .id(d => `${d.source.id}_${d.target.id}`)
       .d(d => d.spline ? `M${d.sourceX},${d.sourceY}C${d.sourceBisectX},${d.sourceBisectY} ${d.targetBisectX},${d.targetBisectY} ${d.targetX},${d.targetY}` : `M${d.source.x},${d.source.y} ${d.target.x},${d.target.y}`)
       .data(edges)
-      .select(elem("g.d3plus-network-links", {parent: this._container, transition, enter: {transform}, update: {transform}}).node())
+      .select(elem("g.d3plus-rings-links", {parent: this._container, transition, enter: {transform}, update: {transform}}).node())
       .render());
 
     const that = this;
 
     const shapeConfig = {
       label: d => nodes.length <= this._labelCutoff || (this._hover && this._hover(d) || this._active && this._active(d)) ? this._drawLabel(d.data || d.node, d.i) : false,
-      select: elem("g.d3plus-network-nodes", {parent: this._container, transition, enter: {transform}, update: {transform}}).node(),
+      select: elem("g.d3plus-rings-nodes", {parent: this._container, transition, enter: {transform}, update: {transform}}).node(),
       labelBounds: d => d.labelBounds,
       labelConfig: {
         rotate: d => nodeLookup[d.data.data.id].rotate || 0,
