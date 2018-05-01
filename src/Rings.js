@@ -158,12 +158,14 @@ export default class Rings extends Viz {
       return obj;
     }, {});
 
+    let nodes = this._nodes;
+
     if (!this._nodes.length && this._links.length) {
       const nodeIds = Array.from(new Set(this._links.reduce((ids, link) => ids.concat([link.source, link.target]), [])));
-      this._nodes = nodeIds.map(node => typeof node === "object" ? node : {id: node});
+      nodes = nodeIds.map(node => typeof node === "object" ? node : {id: node});
     }
 
-    let nodes = this._nodes.reduce((obj, d, i) => {
+    nodes = nodes.reduce((obj, d, i) => {
       obj[this._nodeGroupBy ? this._nodeGroupBy[this._drawDepth](d, i) : this._id(d, i)] = d;
       return obj;
     }, {});
@@ -191,26 +193,15 @@ export default class Rings extends Viz {
       return obj;
     }, {});
 
-    this._links = this._links.map(link => {
+    const links = this._links.map(link => {
       const check = ["source", "target"];
       return check.reduce((result, check) => {
-        const type = typeof link[check];
-        let val;
-        if (type === "number") {
-          val = nodes[link[check]];
-        }
-        else if (type === "string") {
-          val = nodeLookup[link[check]];
-        }
-        else {
-          val = link[check];
-        }
-        result[check] = val;
+        result[check] = typeof link[check] === "number" ? nodes[link[check]] : nodeLookup[link[check].id || link[check]];
         return result;
       }, {});
     });
 
-    const linkMap = this._links.reduce((map, link) => {
+    const linkMap = links.reduce((map, link) => {
       if (!map[link.source.id]) {
         map[link.source.id] = [];
       }
@@ -489,16 +480,6 @@ export default class Rings extends Viz {
         };
       }
     });
-
-    const nodeIndices = nodes.map(n => n.node);
-    const links = this._links.map(l => ({
-      source: typeof l.source === "number"
-        ? nodes[nodeIndices.indexOf(this._nodes[l.source])]
-        : nodeLookup[l.source.id || l.source],
-      target: typeof l.target === "number"
-        ? nodes[nodeIndices.indexOf(this._nodes[l.target])]
-        : nodeLookup[l.target.id || l.target]
-    }));
 
     this._linkLookup = links.reduce((obj, d) => {
       if (!obj[d.source.id]) obj[d.source.id] = [];
