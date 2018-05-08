@@ -31,47 +31,38 @@ export default class Rings extends Viz {
     this._links = [];
     this._noDataMessage = false;
     this._nodes = [];
+    this._on.mouseenter = () => {};
     this._on["mouseleave.shape"] = () => {
-      this.active(false);
+      this.hover(false);
     };
     this._on["mousemove.shape"] = (d, i) => {
-      if (this._hover && this._drawDepth >= this._groupBy.length - 1) {
-        if (this._focus && this._focus === d.id) {
+      if (this._focus && this._focus === d.id) {
+        this.hover(false);
+        this._on.mouseenter.bind(this)(d, i);
 
-          this.active(false);
-          this._on.mouseenter.bind(this)(d, i);
+        this._focus = undefined;
+      }
+      else {
+        const id = this._nodeGroupBy && this._nodeGroupBy[this._drawDepth](d, i) ? this._nodeGroupBy[this._drawDepth](d, i) : this._id(d, i),
+              links = this._linkLookup[id],
+              node = this._nodeLookup[id];
 
-          this._focus = undefined;
-        }
-        else {
+        const filterIds = [node.id];
+        const xDomain = [node.x - node.r, node.x + node.r],
+              yDomain = [node.y - node.r, node.y + node.r];
 
-          this.hover(false);
+        links.forEach(l => {
+          filterIds.push(l.id);
+          if (l.x - l.r < xDomain[0]) xDomain[0] = l.x - l.r;
+          if (l.x + l.r > xDomain[1]) xDomain[1] = l.x + l.r;
+          if (l.y - l.r < yDomain[0]) yDomain[0] = l.y - l.r;
+          if (l.y + l.r > yDomain[1]) yDomain[1] = l.y + l.r;
+        });
 
-          const id = this._nodeGroupBy && this._nodeGroupBy[this._drawDepth](d, i) ? this._nodeGroupBy[this._drawDepth](d, i) : this._id(d, i),
-                links = this._linkLookup[id],
-                node = this._nodeLookup[id];
-
-          const filterIds = [node.id];
-          const xDomain = [node.x - node.r, node.x + node.r],
-                yDomain = [node.y - node.r, node.y + node.r];
-
-          links.forEach(l => {
-            filterIds.push(l.id);
-            if (l.x - l.r < xDomain[0]) xDomain[0] = l.x - l.r;
-            if (l.x + l.r > xDomain[1]) xDomain[1] = l.x + l.r;
-            if (l.y - l.r < yDomain[0]) yDomain[0] = l.y - l.r;
-            if (l.y + l.r > yDomain[1]) yDomain[1] = l.y + l.r;
-          });
-
-          this.active((h, x) => {
-            if (h.source && h.target) return h.source.id === node.id || h.target.id === node.id;
-            else return filterIds.includes(this._ids(h, x)[this._drawDepth]);
-          });
-
-          this._focus = d.id;
-
-        }
-
+        this.hover((h, x) => {
+          if (h.source && h.target) return h.source.id === node.id || h.target.id === node.id;
+          else return filterIds.includes(this._ids(h, x)[this._drawDepth]);
+        });
       }
     };
     this._on["click.shape"] = d => {
@@ -528,6 +519,21 @@ export default class Rings extends Viz {
    */
   center(_) {
     return arguments.length ? (this._center = _, this) : this._center;
+  }
+
+  /**
+      @memberof Rings
+      @desc If *value* is specified, sets the hover method to the specified function and returns the current class instance.
+      @param {Function} [*value*]
+      @chainable
+   */
+  hover(_) {
+    this._hover = _;
+
+    this._shapes.forEach(s => s.hover(_));
+    if (this._legend) this._legendClass.hover(_);
+
+    return this;
   }
 
   /**
