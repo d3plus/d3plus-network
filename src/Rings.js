@@ -69,49 +69,6 @@ export default class Rings extends Viz {
       this._center = d.id;
       this._draw();
     };
-    this._on["click.legend"] = (d, i) => {
-
-      const ids = this._id(d);
-      let id = this._ids(d);
-      id = id[id.length - 1];
-
-      if (this._hover && this._drawDepth >= this._groupBy.length - 1) {
-
-        if (this._focus && this._focus === ids) {
-
-          this.active(false);
-          this._on.mouseenter.bind(this)(d, i);
-
-          this._focus = undefined;
-        }
-        else {
-
-          this.hover(false);
-
-          const nodes = ids.map(id => this._nodeLookup[id]);
-
-          const filterIds = [id];
-
-          nodes.forEach(l => {
-            filterIds.push(l.id);
-          });
-
-          this.active((h, x) => {
-            if (h.source && h.target) return filterIds.includes(h.source.id) && filterIds.includes(h.target.id);
-            else {
-              const myIds = this._ids(h, x);
-              return filterIds.includes(myIds[myIds.length - 1]);
-            }
-          });
-
-          this._focus = ids;
-        }
-
-        this._on["mousemove.legend"].bind(this)(d, i);
-
-      }
-
-    };
     this._sizeMin = 5;
     this._sizeScale = "sqrt";
     this._shape = constant("Circle");
