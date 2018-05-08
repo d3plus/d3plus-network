@@ -11,7 +11,6 @@ import {accessor, assign, configPrep, constant, elem} from "d3plus-common";
 import {colorLegible} from "d3plus-color";
 import * as shapes from "d3plus-shape";
 import {dataLoad as load, Viz} from "d3plus-viz";
-import {textWrap} from "d3plus-text";
 
 /**
     @class Rings
@@ -383,7 +382,7 @@ export default class Rings extends Viz {
 
             const centerX = width / 2;
             const centerY = height / 2;
-            const middleRing = (secondaryRing + primaryRing) / 1.75;
+            const middleRing = primaryRing + (secondaryRing - primaryRing) * 0.5;
 
             const check = ["source", "target"];
 
@@ -422,47 +421,31 @@ export default class Rings extends Viz {
     nodes.forEach(node => {
 
       if (node.id !== this._center) {
-        node.rotate = node.radians * (180 / Math.PI);
-
         const fontSize = this._shapeConfig.labelConfig.fontSize && this._shapeConfig.labelConfig.fontSize(node) || 11;
+        const lineHeight = fontSize * 1.4;
+        const height = lineHeight * 2;
+        const padding = 5;
+        const width = ringWidth - node.r;
 
-        const wrap = textWrap()
-          .fontSize(fontSize);
+        let angle = node.radians * (180 / Math.PI);
+        let x = node.r + padding;
+        let textAnchor = "start";
 
-        const res = wrap(this._drawLabel(node));
-        const containerWidth = max(res.widths) * 2;
-        const containerHeight = res.lines.length * 1.4 * fontSize * 2;
-        const width = containerWidth / 2;
-        const height = containerHeight / 2;
-        const padding = 15;
-
-        let angle = node.rotate;
-
-        const xVal = Math.cos(node.radians + Math.PI) * (node.r + padding);
-        const yVal = Math.sin(node.radians + Math.PI) * (node.r + padding);
-        const yOffset = node.ring === 1 ? -node.r - yVal + height / 2 : -node.r - yVal + height / 6;
-        let buffer = -width - xVal;
-        let anchor = "end";
-
-        if (Math.round(angle) === 90 || Math.round(angle) === -90) {
-          angle < 0 ? buffer += height / 6 : buffer -= height / 6;
-        }
-        else if (angle < -90 || angle > 90) {
-          angle -= 180;
-          anchor = "start";
+        if (angle < -90 || angle > 90) {
+          x = -node.r - width - padding;
+          textAnchor = "end";
+          angle += 180;
         }
 
         node.labelBounds = {
-          x: buffer,
-          y: yOffset,
-          width: containerWidth,
-          height: containerHeight
+          x,
+          y: -lineHeight / 2,
+          width,
+          height
         };
 
         node.rotate = angle;
-        node.fontColor = "#000";
-        node.fontSize = fontSize;
-        node.textAnchor = anchor;
+        node.textAnchor = textAnchor;
       }
       else {
         node.labelBounds = {
@@ -513,15 +496,16 @@ export default class Rings extends Viz {
 
     const shapeConfig = {
       label: d => nodes.length <= this._labelCutoff || (this._hover && this._hover(d) || this._active && this._active(d)) ? this._drawLabel(d.data || d.node, d.i) : false,
-      select: elem("g.d3plus-rings-nodes", {parent: this._container, transition, enter: {transform}, update: {transform}}).node(),
       labelBounds: d => d.labelBounds,
       labelConfig: {
-        rotate: d => nodeLookup[d.data.data.id].rotate || 0,
-        fontColor: d => nodeLookup[d.data.data.id].fontColor ? colorLegible(configPrep.bind(that)(that._shapeConfig, "shape", d.key).fill(d)) : configPrep.bind(that)(that._shapeConfig, "shape", d.key).labelConfig.fontColor(d),
-        fontSize: d => nodeLookup[d.data.data.id].fontSize || configPrep.bind(that)(that._shapeConfig, "shape", d.key).labelConfig.fontSize,
+        fontColor: d => d.data.data.id === this._center ? configPrep.bind(that)(that._shapeConfig, "shape", d.key).labelConfig.fontColor(d) : colorLegible(configPrep.bind(that)(that._shapeConfig, "shape", d.key).fill(d)),
         fontResize: d => d.data.data.id === this._center,
-        textAnchor: d => nodeLookup[d.data.data.id].textAnchor || configPrep.bind(that)(that._shapeConfig, "shape", d.key).labelConfig.textAnchor
-      }
+        padding: 0,
+        textAnchor: d => nodeLookup[d.data.data.id].textAnchor || configPrep.bind(that)(that._shapeConfig, "shape", d.key).labelConfig.textAnchor,
+        verticalAlign: d => d.data.data.id === this._center ? "middle" : "top"
+      },
+      rotate: d => nodeLookup[d.id].rotate || 0,
+      select: elem("g.d3plus-rings-nodes", {parent: this._container, transition, enter: {transform}, update: {transform}}).node()
     };
 
     nest().key(d => d.shape).entries(nodes).forEach(d => {
