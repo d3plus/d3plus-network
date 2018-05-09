@@ -88,9 +88,7 @@ export default class Rings extends Viz {
         strokeWidth: 1
       }
     });
-
-    this._zoom = true;
-
+    this._zoom = false;
   }
 
   /**
