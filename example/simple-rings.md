@@ -17,7 +17,6 @@ var links = [
   new d3plus.Rings()
     .links(links)
     .label(d => d.id)
-    .noDataMessage(false)
     .center("alpha")
     .render();
 ```
