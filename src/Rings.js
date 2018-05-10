@@ -15,7 +15,7 @@ import {dataLoad as load, Viz} from "d3plus-viz";
 /**
     @class Rings
     @extends external:Viz
-    @desc
+    @desc Creates a ring visualization based on a defined set of nodes and edges. [Click here](http://d3plus.org/examples/d3plus-network/simple-rings/) for help getting started using the Rings class.
 */
 export default class Rings extends Viz {
 
@@ -171,7 +171,7 @@ export default class Rings extends Viz {
           secondaryRing = ringWidth * 2;
 
     const center = nodeLookup[this._center];
-    
+
     center.x = width / 2;
     center.y = height / 2;
     center.r = this._sizeMin ? max([this._sizeMin, primaryRing * .65]) : this._sizeMax ? min([this._sizeMax, primaryRing * .65]) : primaryRing * .65;
@@ -235,7 +235,7 @@ export default class Rings extends Viz {
         node.radians = a;
         node.x = width / 2 + secondaryRing * Math.cos(a);
         node.y = height / 2 + secondaryRing * Math.sin(a);
-        
+
         secondaries.push(node);
       });
     });
@@ -410,7 +410,7 @@ export default class Rings extends Viz {
       obj[d.target.id].push(d.source);
       return obj;
     }, {});
-    
+
     this._shapes.push(new shapes.Path()
       .config(configPrep.bind(this)(this._shapeConfig, "edge", "Path"))
       .id(d => `${d.source.id}_${d.target.id}`)
