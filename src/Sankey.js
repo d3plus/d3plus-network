@@ -17,11 +17,12 @@ export default class Sankey extends Viz {
       @private
   */
   constructor() {
-
     super();
+    this._nodeId = false;
     this._links = accessor("links");
     this._noDataMessage = false;
     this._nodes = accessor("nodes");
+    this._nodeWidth = 30;
     this._sankey = sankey();
     this._shapeConfig = assign(this._shapeConfig, {
       labelConfig: {
@@ -35,9 +36,9 @@ export default class Sankey extends Viz {
       Path: {
         fill: "none",
         label: false,
-        stroke: "#eee",
+        stroke: "#dbdbdb",
         strokeWidth: 20,
-        strokeOpacity: 0.6
+        strokeOpacity: 0.4
       }
     });
   }
@@ -54,27 +55,42 @@ export default class Sankey extends Viz {
 
     const path = sankeyLinkHorizontal();
 
+    const nodes = this._nodes;
+
+    const nodeLookup = this._nodeLookup = this._nodes.reduce((obj, d, key) => {
+      obj[d[this._nodeId || "id"]] = key;
+      return obj;
+    }, {});
+
+    const links = this._links.map(link => {
+      const check = ["source", "target"];
+
+      const linkLookup = check.reduce((result, item) => {
+        result[item] =
+          typeof link[item] === "number" ? link[item] : nodeLookup[link[item]];
+        return result;
+      }, {});
+
+      return {
+        source: linkLookup.source,
+        target: linkLookup.target,
+        value: link.value
+      };
+    });
+
     const transform = `translate(${this._margin.left}, ${this._margin.top})`;
 
-    const sankeyData = this._sankey
-      .nodeWidth(30)
-      // .nodePadding(10)
-      .nodes(this._nodes)
-      .links(this._links)
+    this._sankey
+      .nodeWidth(this._nodeWidth)
+      .nodes(nodes)
+      .links(links)
       .size([width, height])();
-
-    /* sankeyData.forEach((d, i) => {
-      d.__d3plus__ = true;
-      d.i = i;
-    });*/
-
-    // const link = sankey.data(links)
 
     this._shapes.push(
       new Path()
         .config(this._shapeConfig)
         .config(this._shapeConfig.Path)
-        .data(this._links)
+        .data(links)
         .d(path)
         .select(
           elem("g.d3plus-Links", {
@@ -83,6 +99,7 @@ export default class Sankey extends Viz {
             update: {transform}
           }).node()
         )
+        .config(assign(this._tooltip, false))
         .config(
           configPrep.bind(this)(
             assign(this._shapeConfig, {
@@ -107,7 +124,7 @@ export default class Sankey extends Viz {
       new Rect()
         .config(this._shapeConfig)
         .config(this._shapeConfig.Path)
-        .data(this._nodes)
+        .data(nodes)
         .height(d => d.y1 - d.y0)
         .width(d => d.x1 - d.x0)
         .x(d => (d.x1 + d.x0) / 2)
@@ -122,8 +139,12 @@ export default class Sankey extends Viz {
         .config(configPrep.bind(this)(this._shapeConfig, "shape", "Rect"))
         .render()
     );
-
+    console.log(this);
     return this;
+  }
+
+  nodeId(_) {
+    return arguments.length ? (this._nodeId = _, this) : this._nodeId;
   }
 
   /**
@@ -151,5 +172,30 @@ Additionally, a custom formatting function can be passed as a second argument to
   */
   nodes(_) {
     return arguments.length ? (this._nodes = _, this) : this._nodes;
+  }
+
+  /**
+      @memberof Sankey
+      @desc If *value* is specified, sets the width of the node and returns the current class instance. If *value* is not specified, returns the current nodeWidth. By default, the nodeWidth size is 30.
+      @param {Number} [*value* = 30]
+      @chainable
+  */
+  nodeWidth(_) {
+    return arguments.length ? (this._nodeWidth = _, this) : this._nodeWidth;
+  }
+
+  /**
+      @memberof Sankey
+      @desc If *value* is specified, sets the value accessor to the specified function or number and returns the current class instance. If *value* is not specified, returns the current value accessor.
+      @param {Function|String} *value*
+      @example
+function value(d) {
+  return d.value;
+}
+  */
+  value(_) {
+    return arguments.length
+      ? (this._value = typeof _ === "function" ? _ : accessor(_), this)
+      : this._value;
   }
 }
