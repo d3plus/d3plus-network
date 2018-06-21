@@ -19,7 +19,7 @@ import {dataLoad as load, Viz} from "d3plus-viz";
   @private
 */
 function constructAriaLabel(d, i) {
-  const validSize =  this._size === undefined ? "" : (typeof this._size === "function" ? this._size(d) :  this._size);
+  const validSize =  this._size === undefined ? "" : typeof this._size === "function" ? this._size(d) :  this._size;
   return this._drawLabel(d, i) + validSize + ".";
 }
 
