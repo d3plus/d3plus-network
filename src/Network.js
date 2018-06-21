@@ -14,16 +14,6 @@ import * as shapes from "d3plus-shape";
 import {dataLoad as load, Viz} from "d3plus-viz";
 
 /**
-  @function constructAriaLabel
-  @desc Returns value for aria-label property of Shapes.
-  @private
-*/
-function constructAriaLabel(d, i) {
-  const validSize =  this._size === undefined ? "" : typeof this._size === "function" ? this._size(d) :  this._size;
-  return this._drawLabel(d, i) + validSize + ".";
-}
-
-/**
     @class Network
     @extends external:Viz
     @desc Creates a network visualization based on a defined set of nodes and edges. [Click here](http://d3plus.org/examples/d3plus-network/getting-started/) for help getting started using the Network class.
@@ -368,7 +358,10 @@ export default class Network extends Viz {
         .config(shapeConfig)
         .config(shapeConfig[d.key] || {})
         .data(d.values)
-        .config({ariaLabel: constructAriaLabel.bind(this)})
+        .config({ariaLabel: (d, i) => {
+          const validSize = this._size ? `, ${this._size(d, i)}` : "";
+          return `${this._drawLabel(d, i)}${validSize}.`;
+        }})
         .render());
     });
 
