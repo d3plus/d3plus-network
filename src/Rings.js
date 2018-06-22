@@ -73,6 +73,10 @@ export default class Rings extends Viz {
     this._sizeScale = "sqrt";
     this._shape = constant("Circle");
     this._shapeConfig = assign(this._shapeConfig, {
+      ariaLabel: (d, i) => {
+        const validSize = this._size ? `, ${this._size(d, i)}` : "";
+        return `${this._drawLabel(d, i)}${validSize}.`;
+      },
       labelConfig: {
         duration: 0,
         fontMin: 1,
@@ -440,10 +444,6 @@ export default class Rings extends Viz {
         .config(configPrep.bind(this)(this._shapeConfig, "shape", d.key))
         .config(shapeConfig)
         .data(d.values)
-        .config({ariaLabel: (d, i) => {
-          const validSize = this._size ? `, ${this._size(d, i)}` : "";
-          return `${this._drawLabel(d, i)}${validSize}.`;
-        }})
         .render());
     });
 
