@@ -1,11 +1,17 @@
+/**
+    @external Viz
+    @see https://github.com/d3plus/d3plus-viz#Viz
+*/
+import {nest} from "d3-collection";
 import {sankey, sankeyLinkHorizontal} from "d3-sankey";
 
 import {accessor, assign, configPrep, constant, elem} from "d3plus-common";
-import {Path, Rect} from "d3plus-shape";
+import {Path} from "d3plus-shape";
+import * as shapes from "d3plus-shape";
 import {dataLoad as load, Viz} from "d3plus-viz";
 
 /**
-    @class Rings
+    @class Sankey
     @extends external:Viz
     @desc Creates a sankey visualization based on a defined set of XXXXX. [Click here](xxxxxx) for help getting started using the Sankey class.
 */
@@ -18,29 +24,33 @@ export default class Sankey extends Viz {
   */
   constructor() {
     super();
-    this._nodeId = false;
+    this._nodeId = accessor("id");
     this._links = accessor("links");
     this._noDataMessage = false;
     this._nodes = accessor("nodes");
     this._nodeWidth = 30;
+    this._on.mouseenter = () => {};
+    this._on["mouseleave.shape"] = () => {
+      this.hover(false);
+    };
+    this._path = sankeyLinkHorizontal();
     this._sankey = sankey();
+    this._shape = constant("Rect");
     this._shapeConfig = assign(this._shapeConfig, {
-      labelConfig: {
-        duration: 0,
-        fontMin: 1,
-        fontResize: true,
-        labelPadding: 0,
-        textAnchor: "middle",
-        verticalAlign: "middle"
-      },
       Path: {
         fill: "none",
         label: false,
         stroke: "#dbdbdb",
-        strokeWidth: 20,
-        strokeOpacity: 0.4
+        strokeOpacity: 0.4,
+        strokeWidth: d =>
+          Math.max(
+            1,
+            Math.abs(d.source.y1 - d.source.y0) * (d.value / d.source.value) -
+              20
+          )
       }
     });
+    this._value = constant(1);
   }
 
   /**
@@ -53,18 +63,29 @@ export default class Sankey extends Viz {
     const height = this._height - this._margin.top - this._margin.bottom,
           width = this._width - this._margin.left - this._margin.right;
 
-    const path = sankeyLinkHorizontal();
+    const nodes = this._nodes
+      .map((id, i) => {
+        const n = id;
 
-    const nodes = this._nodes;
+        if (n === undefined) return false;
 
-    const nodeLookup = this._nodeLookup = this._nodes.reduce((obj, d, key) => {
-      obj[d[this._nodeId || "id"]] = key;
+        return {
+          __d3plus__: true,
+          data: n,
+          id: n.id || this._nodeId(id, i),
+          node: n,
+          shape: "Rect"
+        };
+      })
+      .filter(n => n);
+
+    const nodeLookup = nodes.reduce((obj, d, i) => {
+      obj[this._id(d, i)] = i;
       return obj;
     }, {});
 
     const links = this._links.map(link => {
       const check = ["source", "target"];
-
       const linkLookup = check.reduce((result, item) => {
         result[item] =
           typeof link[item] === "number" ? link[item] : nodeLookup[link[item]];
@@ -74,9 +95,17 @@ export default class Sankey extends Viz {
       return {
         source: linkLookup.source,
         target: linkLookup.target,
-        value: link.value
+        value: link.value || this._value
       };
     });
+
+    this._linkLookup = links.reduce((obj, d) => {
+      if (!obj[d.source]) obj[d.source] = [];
+      obj[d.source].push(d.target);
+      if (!obj[d.target]) obj[d.target] = [];
+      obj[d.target].push(d.source);
+      return obj;
+    }, {});
 
     const transform = `translate(${this._margin.left}, ${this._margin.top})`;
 
@@ -88,10 +117,9 @@ export default class Sankey extends Viz {
 
     this._shapes.push(
       new Path()
-        .config(this._shapeConfig)
         .config(this._shapeConfig.Path)
         .data(links)
-        .d(path)
+        .d(this._path)
         .select(
           elem("g.d3plus-Links", {
             parent: this._select,
@@ -99,79 +127,83 @@ export default class Sankey extends Viz {
             update: {transform}
           }).node()
         )
-        .config(assign(this._tooltip, false))
-        .config(
-          configPrep.bind(this)(
-            assign(this._shapeConfig, {
-              Path: {
-                strokeWidth: d =>
-                  Math.max(
-                    1,
-                    Math.abs(d.source.y1 - d.source.y0) *
-                      (d.value / d.source.value) -
-                      20
-                  )
-              }
-            }),
-            "shape",
-            "Path"
-          )
-        )
         .render()
     );
-
-    this._shapes.push(
-      new Rect()
-        .config(this._shapeConfig)
-        .config(this._shapeConfig.Path)
-        .data(nodes)
-        .height(d => d.y1 - d.y0)
-        .width(d => d.x1 - d.x0)
-        .x(d => (d.x1 + d.x0) / 2)
-        .y(d => (d.y1 + d.y0) / 2)
-        .select(
-          elem("g.d3plus-sankey-nodes", {
-            parent: this._select,
-            enter: {transform},
-            update: {transform}
-          }).node()
-        )
-        .config(configPrep.bind(this)(this._shapeConfig, "shape", "Rect"))
-        .render()
-    );
-    console.log(this);
+    nest()
+      .key(d => d.shape)
+      .entries(nodes)
+      .forEach(d => {
+        this._shapes.push(
+          new shapes[d.key]()
+            .data(nodes)
+            .height(d => d.y1 - d.y0)
+            .width(d => d.x1 - d.x0)
+            .x(d => (d.x1 + d.x0) / 2)
+            .y(d => (d.y1 + d.y0) / 2)
+            .select(
+              elem("g.d3plus-sankey-nodes", {
+                parent: this._select,
+                enter: {transform},
+                update: {transform}
+              }).node()
+            )
+            .config(configPrep.bind(this)(this._shapeConfig, "shape", d.key))
+            .config(this._shapeConfig[d.key] || {})
+            .render()
+        );
+      });
     return this;
-  }
-
-  nodeId(_) {
-    return arguments.length ? (this._nodeId = _, this) : this._nodeId;
   }
 
   /**
       @memberof Network
-      @desc A predefined *Array* of edges that connect each object passed to the [node](#Network.node) method. The `source` and `target` keys in each link need to map to the nodes in one of three ways:
-1. The index of the node in the nodes array (as in [this](#) example).
-2. The actual node *Object* itself.
-3. A *String* value matching the `id` of the node.
+      @desc A predefined *Array* of edges that connect each object passed to the [node](#Network.node) method. The `source` and `target` keys in each link need to map to the nodes in one of one way:
+1. A *String* value matching the `id` of the node.
 
-The value passed should either be an *Array* of data or a *String* representing a filepath or URL to be loaded. An optional formatting function can be passed as a second argument to this method. This custom function will be passed the data that has been loaded, as long as there are no errors. This function should return the final links *Array*.
-      @param {Array|String} *links* = []
+The value passed should be an *Array* of data. An optional formatting function can be passed as a second argument to this method. This custom function will be passed the data that has been loaded, as long as there are no errors. This function should return the final links *Array*.
+      @param {Array} *links* = []
       @chainable
   */
-  links(_) {
-    return arguments.length ? (this._links = _, this) : this._links;
+  links(_, f) {
+    if (arguments.length) {
+      const prev = this._queue.find(q => q[3] === "links");
+      const d = [load.bind(this), _, f, "links"];
+      if (prev) this._queue[this._queue.indexOf(prev)] = d;
+      else this._queue.push(d);
+      return this;
+    }
+    return this._links;
   }
 
   /**
       @memberof Sankey
-      @desc The list of nodes to be used for drawing the network. The value passed should either be an *Array* of data or a *String* representing a filepath or URL to be loaded.
-
-Additionally, a custom formatting function can be passed as a second argument to this method. This custom function will be passed the data that has been loaded, as long as there are no errors. This function should return the final node *Array*.
-      @param {Array|String} *nodes* = []
+      @desc If *value* is specified, sets the node id accessor(s) to the specified array of values and returns the current class instance. If *value* is not specified, returns the current node group accessor.
+      @param {String} [*value* = "id"]
       @chainable
   */
-  nodes(_) {
-    return arguments.length ? (this._nodes = _, this) : this._nodes;
+  nodeId(_) {
+    return arguments.length
+      ? (this._nodeId = typeof _ === "function" ? _ : accessor(_), this)
+      : this._nodeId;
+  }
+
+  /**
+      @memberof Sankey
+      @desc The list of nodes to be used for drawing the network. The value passed must be an *Array* of data.
+
+Additionally, a custom formatting function can be passed as a second argument to this method. This custom function will be passed the data that has been loaded, as long as there are no errors. This function should return the final node *Array*.
+      @param {Array} *nodes* = []
+      @chainable
+  */
+  nodes(_, f) {
+    if (arguments.length) {
+      const prev = this._queue.find(q => q[3] === "nodes");
+      const d = [load.bind(this), _, f, "nodes"];
+      if (prev) this._queue[this._queue.indexOf(prev)] = d;
+      else this._queue.push(d);
+      return this;
+    }
+    return this._nodes;
   }
 
   /**
@@ -186,7 +218,7 @@ Additionally, a custom formatting function can be passed as a second argument to
 
   /**
       @memberof Sankey
-      @desc If *value* is specified, sets the value accessor to the specified function or number and returns the current class instance. If *value* is not specified, returns the current value accessor.
+      @desc If *value* is specified, sets the width of the links and returns the current class instance. If *value* is not specified, returns the current value accessor.
       @param {Function|String} *value*
       @example
 function value(d) {
