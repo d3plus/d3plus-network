@@ -143,6 +143,10 @@ export default class Network extends Viz {
     this._sizeScale = "sqrt";
     this._shape = constant("Circle");
     this._shapeConfig = assign(this._shapeConfig, {
+      ariaLabel: (d, i) => {
+        const validSize = this._size ? `, ${this._size(d, i)}` : "";
+        return `${this._drawLabel(d, i)}${validSize}.`;
+      },
       labelConfig: {
         duration: 0,
         fontMin: 1,
