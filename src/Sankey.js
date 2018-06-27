@@ -33,22 +33,63 @@ export default class Sankey extends Viz {
     this._on["mouseleave.shape"] = () => {
       this.hover(false);
     };
+    this._on["mousemove.shape"] = (d, i) => {
+      if (this._focus && this._focus === d.id) {
+        this.hover(false);
+        this._on.mouseenter.bind(this)(d, i);
+
+        this._focus = undefined;
+      }
+      else {
+        const id = this._nodeId(d, i),
+              node = this._nodeLookup[id],
+              nodeLookup = Object.keys(this._nodeLookup).reduce((all, item) => {
+                all[this._nodeLookup[item]] = !isNaN(item) ? parseInt(item) : item;
+                return all;
+              }, {});
+
+        const links = this._linkLookup[node];
+        const filterIds = [id];
+
+        links.forEach(l => {
+          filterIds.push(nodeLookup[l]);
+        });
+
+        this.hover((h, x) => {
+          if (h.source && h.target) {
+            return h.source.id === id || h.target.id === id;
+          }
+          else {
+            return filterIds.includes(this._nodeId(h, x));
+          }
+        });
+      }
+    };
     this._path = sankeyLinkHorizontal();
     this._sankey = sankey();
     this._shape = constant("Rect");
     this._shapeConfig = assign(this._shapeConfig, {
       Path: {
         fill: "none",
+        hoverStyle: {
+          "stroke-width": d =>
+            Math.max(
+              1,
+              Math.abs(d.source.y1 - d.source.y0) * (d.value / d.source.value) -
+                15
+            )
+        },
         label: false,
-        stroke: "#dbdbdb",
-        strokeOpacity: 0.4,
+        stroke: "#DBDBDB",
+        strokeOpacity: 0.2,
         strokeWidth: d =>
           Math.max(
             1,
             Math.abs(d.source.y1 - d.source.y0) * (d.value / d.source.value) -
               20
           )
-      }
+      },
+      Rect: {}
     });
     this._value = constant(1);
   }
@@ -67,20 +108,18 @@ export default class Sankey extends Viz {
       .map((id, i) => {
         const n = id;
 
-        if (n === undefined) return false;
-
         return {
           __d3plus__: true,
           data: n,
-          id: n.id || this._nodeId(id, i),
+          id: this._nodeId(id, i),
           node: n,
           shape: "Rect"
         };
       })
       .filter(n => n);
 
-    const nodeLookup = nodes.reduce((obj, d, i) => {
-      obj[this._id(d, i)] = i;
+    const nodeLookup = this._nodeLookup = nodes.reduce((obj, d, i) => {
+      obj[d.id] = i;
       return obj;
     }, {});
 
@@ -88,7 +127,9 @@ export default class Sankey extends Viz {
       const check = ["source", "target"];
       const linkLookup = check.reduce((result, item) => {
         result[item] =
-          typeof link[item] === "number" ? link[item] : nodeLookup[link[item]];
+          typeof link[item] === "number"
+            ? nodeLookup[link[item]]
+            : nodeLookup[link[item]];
         return result;
       }, {});
 
@@ -148,7 +189,6 @@ export default class Sankey extends Viz {
               }).node()
             )
             .config(configPrep.bind(this)(this._shapeConfig, "shape", d.key))
-            .config(this._shapeConfig[d.key] || {})
             .render()
         );
       });
@@ -156,8 +196,22 @@ export default class Sankey extends Viz {
   }
 
   /**
-      @memberof Network
-      @desc A predefined *Array* of edges that connect each object passed to the [node](#Network.node) method. The `source` and `target` keys in each link need to map to the nodes in one of one way:
+      @memberof Rings
+      @desc If *value* is specified, sets the hover method to the specified function and returns the current class instance.
+      @param {Function} [*value*]
+      @chainable
+   */
+  hover(_) {
+    this._hover = _;
+    this._shapes.forEach(s => s.hover(_));
+    if (this._legend) this._legendClass.hover(_);
+
+    return this;
+  }
+
+  /**
+      @memberof Sankey
+      @desc A predefined *Array* of edges that connect each object passed to the [node](#Sankey.node) method. The `source` and `target` keys in each link need to map to the nodes in one of one way:
 1. A *String* value matching the `id` of the node.
 
 The value passed should be an *Array* of data. An optional formatting function can be passed as a second argument to this method. This custom function will be passed the data that has been loaded, as long as there are no errors. This function should return the final links *Array*.
