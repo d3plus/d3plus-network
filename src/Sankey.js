@@ -176,7 +176,7 @@ export default class Sankey extends Viz {
       .forEach(d => {
         this._shapes.push(
           new shapes[d.key]()
-            .data(nodes)
+            .data(d.values)
             .height(d => d.y1 - d.y0)
             .width(d => d.x1 - d.x0)
             .x(d => (d.x1 + d.x0) / 2)
@@ -196,7 +196,7 @@ export default class Sankey extends Viz {
   }
 
   /**
-      @memberof Rings
+      @memberof Sankey
       @desc If *value* is specified, sets the hover method to the specified function and returns the current class instance.
       @param {Function} [*value*]
       @chainable
