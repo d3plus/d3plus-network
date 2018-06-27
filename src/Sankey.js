@@ -13,7 +13,7 @@ import {dataLoad as load, Viz} from "d3plus-viz";
 /**
     @class Sankey
     @extends external:Viz
-    @desc Creates a sankey visualization based on a defined set of XXXXX. [Click here](xxxxxx) for help getting started using the Sankey class.
+    @desc Creates a sankey visualization based on a defined set of nodes and links. [Click here](http://d3plus.org/examples/d3plus-network/sankey-diagram/) for help getting started using the Sankey class.
 */
 export default class Sankey extends Viz {
 
