@@ -72,26 +72,17 @@ export default class Sankey extends Viz {
       Path: {
         fill: "none",
         hoverStyle: {
-          "stroke-width": d =>
-            Math.max(
-              1,
-              Math.abs(d.source.y1 - d.source.y0) * (d.value / d.source.value) -
-                15
-            )
+          "stroke-width": (d, i) => Math.max(1, Math.abs(d.source.y1 - d.source.y0) * (this._value(d, i) / this._value(d.source, i)) - 15)
         },
         label: false,
         stroke: "#DBDBDB",
         strokeOpacity: 0.2,
-        strokeWidth: d =>
-          Math.max(
-            1,
-            Math.abs(d.source.y1 - d.source.y0) * (d.value / d.source.value) -
-              20
-          )
+        strokeWidth: (d, i) =>
+          Math.max(1, Math.abs(d.source.y1 - d.source.y0) * (this._value(d, i) / this._value(d.source, i)) - 20)
       },
       Rect: {}
     });
-    this._value = constant(1);
+    this._value = accessor("value");
   }
 
   /**
@@ -123,7 +114,7 @@ export default class Sankey extends Viz {
       return obj;
     }, {});
 
-    const links = this._links.map(link => {
+    const links = this._links.map((link, i) => {
       const check = ["source", "target"];
       const linkLookup = check.reduce((result, item) => {
         result[item] =
@@ -136,7 +127,7 @@ export default class Sankey extends Viz {
       return {
         source: linkLookup.source,
         target: linkLookup.target,
-        value: link.value || this._value
+        value: this._value(link, i) || 1
       };
     });
 
@@ -273,13 +264,15 @@ Additionally, a custom formatting function can be passed as a second argument to
   /**
       @memberof Sankey
       @desc If *value* is specified, sets the width of the links and returns the current class instance. If *value* is not specified, returns the current value accessor.
-      @param {Function|String} *value*
+      @param {Function|Number} *value*
       @example
 function value(d) {
   return d.value;
 }
   */
   value(_) {
+    console.log(_);
+    console.log("Helelll");
     return arguments.length
       ? (this._value = typeof _ === "function" ? _ : accessor(_), this)
       : this._value;
