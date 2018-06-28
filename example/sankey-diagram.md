@@ -13,7 +13,7 @@ var nodes = [
 ];
 ```
 
-The `source` and `target` keys in each link need to *String* values matching the `id` of the associated node.
+The `source` and `target` keys in each link need to be *String* values matching the `id` of the associated node.
 
 ```js
 var links = [
