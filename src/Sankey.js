@@ -72,17 +72,17 @@ export default class Sankey extends Viz {
       Path: {
         fill: "none",
         hoverStyle: {
-          "stroke-width": (d, i) => Math.max(1, Math.abs(d.source.y1 - d.source.y0) * (this._value(d, i) / this._value(d.source, i)) - 15)
+          "stroke-width": (d, i) => Math.max(1, Math.abs(d.source.y1 - d.source.y0) * (this._value(d, i) / d.source.value) - 20)
         },
         label: false,
         stroke: "#DBDBDB",
         strokeOpacity: 0.2,
-        strokeWidth: (d, i) =>
-          Math.max(1, Math.abs(d.source.y1 - d.source.y0) * (this._value(d, i) / this._value(d.source, i)) - 20)
+        strokeWidth: (d, i) => Math.max(1, Math.abs(d.source.y1 - d.source.y0) * (this._value(d, i) / d.source.value) - 20)
+          
       },
       Rect: {}
     });
-    this._value = accessor("value");
+    this._value = constant(1);
   }
 
   /**
@@ -123,11 +123,10 @@ export default class Sankey extends Viz {
             : nodeLookup[link[item]];
         return result;
       }, {});
-
       return {
         source: linkLookup.source,
         target: linkLookup.target,
-        value: this._value(link, i) || 1
+        value: this._value(link, i)
       };
     });
 
@@ -271,8 +270,7 @@ function value(d) {
 }
   */
   value(_) {
-    console.log(_);
-    console.log("Helelll");
+
     return arguments.length
       ? (this._value = typeof _ === "function" ? _ : accessor(_), this)
       : this._value;
