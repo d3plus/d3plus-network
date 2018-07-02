@@ -44,7 +44,7 @@ export default class Sankey extends Viz {
         const id = this._nodeId(d, i),
               node = this._nodeLookup[id],
               nodeLookup = Object.keys(this._nodeLookup).reduce((all, item) => {
-                all[this._nodeLookup[item]] = !isNaN(item) ? parseInt(item) : item;
+                all[this._nodeLookup[item]] = !isNaN(item) ? parseInt(item, 10) : item;
                 return all;
               }, {});
 
@@ -78,7 +78,7 @@ export default class Sankey extends Viz {
         stroke: "#DBDBDB",
         strokeOpacity: 0.2,
         strokeWidth: (d, i) => Math.max(1, Math.abs(d.source.y1 - d.source.y0) * (this._value(d, i) / d.source.value) - 20)
-          
+
       },
       Rect: {}
     });
