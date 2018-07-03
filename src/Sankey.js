@@ -3,7 +3,21 @@
     @see https://github.com/d3plus/d3plus-viz#Viz
 */
 import {nest} from "d3-collection";
-import {sankey, sankeyLinkHorizontal} from "d3-sankey";
+import {
+  sankey,
+  sankeyCenter,
+  sankeyJustify,
+  sankeyLeft,
+  sankeyLinkHorizontal,
+  sankeyRight
+} from "d3-sankey";
+
+const sankeyAligns = {
+  center: sankeyCenter,
+  justify: sankeyJustify,
+  left: sankeyLeft,
+  right: sankeyRight
+};
 
 import {accessor, assign, configPrep, constant, elem} from "d3plus-common";
 import {Path} from "d3plus-shape";
@@ -28,6 +42,7 @@ export default class Sankey extends Viz {
     this._links = accessor("links");
     this._noDataMessage = false;
     this._nodes = accessor("nodes");
+    this._nodeAlign = sankeyAligns["justify"];
     this._nodeWidth = 30;
     this._on.mouseenter = () => {};
     this._on["mouseleave.shape"] = () => {
@@ -139,6 +154,7 @@ export default class Sankey extends Viz {
     const transform = `translate(${this._margin.left}, ${this._margin.top})`;
 
     this._sankey
+      .nodeAlign(this._nodeAlign)
       .nodeWidth(this._nodeWidth)
       .nodes(nodes)
       .links(links)
@@ -215,6 +231,18 @@ The value passed should be an *Array* of data. An optional formatting function c
       return this;
     }
     return this._links;
+  }
+
+  /**
+      @memberof Sankey
+      @desc Sets the nodeAlign property of the sankey layout, which can either be "left", "right", "center", or "justify".
+      @param {Function|String} [*value* = "justify"]
+      @chainable
+  */
+  nodeAlign(_) {
+    return arguments.length
+      ? (this._nodeAlign = typeof _ === "function" ? _ : sankeyAligns[_], this)
+      : this._nodeAlign;
   }
 
   /**
