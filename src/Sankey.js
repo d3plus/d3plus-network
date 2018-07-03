@@ -33,7 +33,9 @@ export default class Sankey extends Viz {
     this._on["mouseleave.shape"] = () => {
       this.hover(false);
     };
+    const defaultMouseMove = this._on["mousemove.shape"];
     this._on["mousemove.shape"] = (d, i) => {
+      defaultMouseMove(d, i);
       if (this._focus && this._focus === d.id) {
         this.hover(false);
         this._on.mouseenter.bind(this)(d, i);
