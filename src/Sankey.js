@@ -74,12 +74,12 @@ export default class Sankey extends Viz {
       Path: {
         fill: "none",
         hoverStyle: {
-          "stroke-width": (d, i) => Math.max(1, Math.abs(d.source.y1 - d.source.y0) * (this._value(d, i) / d.source.value) - 2)
+          "stroke-width": d => Math.max(1, Math.abs(d.source.y1 - d.source.y0) * (d.value / d.source.value) - 2)
         },
         label: false,
         stroke: "#DBDBDB",
         strokeOpacity: 0.5,
-        strokeWidth: (d, i) => Math.max(1, Math.abs(d.source.y1 - d.source.y0) * (this._value(d, i) / d.source.value) - 2)
+        strokeWidth: d => Math.max(1, Math.abs(d.source.y1 - d.source.y0) * (d.value / d.source.value) - 2)
 
       },
       Rect: {}
