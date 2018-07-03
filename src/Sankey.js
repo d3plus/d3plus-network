@@ -96,18 +96,14 @@ export default class Sankey extends Viz {
           width = this._width - this._margin.left - this._margin.right;
 
     const nodes = this._nodes
-      .map((id, i) => {
-        const n = id;
-
-        return {
-          __d3plus__: true,
-          data: n,
-          id: this._nodeId(id, i),
-          node: n,
-          shape: "Rect"
-        };
-      })
-      .filter(n => n);
+      .map((n, i) => ({
+        __d3plus__: true,
+        data: n,
+        i,
+        id: this._nodeId(n, i),
+        node: n,
+        shape: "Rect"
+      }));
 
     const nodeLookup = this._nodeLookup = nodes.reduce((obj, d, i) => {
       obj[d.id] = i;
