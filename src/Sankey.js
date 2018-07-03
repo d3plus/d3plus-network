@@ -42,7 +42,7 @@ export default class Sankey extends Viz {
     this._links = accessor("links");
     this._noDataMessage = false;
     this._nodes = accessor("nodes");
-    this._nodeAlign = sankeyAligns["justify"];
+    this._nodeAlign = sankeyAligns.justify;
     this._nodeWidth = 30;
     this._on.mouseenter = () => {};
     this._on["mouseleave.shape"] = () => {
