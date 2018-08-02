@@ -28,7 +28,7 @@
     "d3-sankey": "^0.7.1",
     "d3-scale": "^2.0.0",
     "d3plus-common": "^0.6.35",
-    "d3plus-shape": "^0.14.11",
+    "d3plus-shape": "^0.15.0",
     "d3plus-viz": "^0.11.14"
   },
   "scripts": {
