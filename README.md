@@ -61,7 +61,7 @@ new d3plus.Network()
 
 ### More Examples
 
- * [Simple Sankey Diagram](http://d3plus.org/examples/d3plus-network/sankey-diagram/)<sup> ***New***</sup>
+ * [Simple Sankey Diagram](http://d3plus.org/examples/d3plus-network/sankey-diagram/)
  * [Simple Rings](http://d3plus.org/examples/d3plus-network/simple-rings/)
 
 ## API Reference
@@ -419,4 +419,4 @@ function value(d) {
 
 
 
-###### <sub>Documentation generated on Tue, 03 Jul 2018 18:19:56 GMT</sub>
+###### <sub>Documentation generated on Wed, 15 Aug 2018 14:55:02 GMT</sub>
