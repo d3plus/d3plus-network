@@ -1,6 +1,6 @@
 {
   "name": "d3plus-network",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "description": "Javascript network visualizations built upon d3 modules.",
   "main": "build/d3plus-network.js",
   "jsnext:main": "es/index",
