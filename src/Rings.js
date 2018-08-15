@@ -431,11 +431,11 @@ export default class Rings extends Viz {
       label: d => nodes.length <= this._labelCutoff || (this._hover && this._hover(d) || this._active && this._active(d)) ? this._drawLabel(d.data || d.node, d.i) : false,
       labelBounds: d => d.labelBounds,
       labelConfig: {
-        fontColor: d => d.data.data.id === this._center ? configPrep.bind(that)(that._shapeConfig, "shape", d.key).labelConfig.fontColor(d) : colorLegible(configPrep.bind(that)(that._shapeConfig, "shape", d.key).fill(d)),
-        fontResize: d => d.data.data.id === this._center,
+        fontColor: d => d.data.id === this._center ? configPrep.bind(that)(that._shapeConfig, "shape", d.key).labelConfig.fontColor(d) : colorLegible(configPrep.bind(that)(that._shapeConfig, "shape", d.key).fill(d)),
+        fontResize: d => d.data.id === this._center,
         padding: 0,
-        textAnchor: d => nodeLookup[d.data.data.id].textAnchor || configPrep.bind(that)(that._shapeConfig, "shape", d.key).labelConfig.textAnchor,
-        verticalAlign: d => d.data.data.id === this._center ? "middle" : "top"
+        textAnchor: d => nodeLookup[d.data.id].textAnchor || configPrep.bind(that)(that._shapeConfig, "shape", d.key).labelConfig.textAnchor,
+        verticalAlign: d => d.data.id === this._center ? "middle" : "top"
       },
       rotate: d => nodeLookup[d.id].rotate || 0,
       select: elem("g.d3plus-rings-nodes", {parent: this._select, transition, enter: {transform}, update: {transform}}).node()
