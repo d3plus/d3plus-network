@@ -43,6 +43,7 @@ export default class Sankey extends Viz {
     this._noDataMessage = false;
     this._nodes = accessor("nodes");
     this._nodeAlign = sankeyAligns.justify;
+    this._nodePadding = 8;
     this._nodeWidth = 30;
     this._on.mouseenter = () => {};
     this._on["mouseleave.shape"] = () => {
@@ -155,6 +156,7 @@ export default class Sankey extends Viz {
 
     this._sankey
       .nodeAlign(this._nodeAlign)
+      .nodePadding(this._nodePadding)
       .nodeWidth(this._nodeWidth)
       .nodes(nodes)
       .links(links)
@@ -275,6 +277,17 @@ Additionally, a custom formatting function can be passed as a second argument to
     }
     return this._nodes;
   }
+
+  /**
+      @memberof Sankey
+      @desc If *value* is specified, sets the padding of the node and returns the current class instance. If *value* is not specified, returns the current nodePadding. By default, the nodePadding size is 8.
+      @param {Number} [*value* = 8]
+      @chainable
+  */
+  nodePadding(_) {
+    return arguments.length ? (this._nodePadding = _, this) : this._nodePadding;
+  }
+
 
   /**
       @memberof Sankey
