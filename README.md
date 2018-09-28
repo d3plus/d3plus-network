@@ -428,4 +428,4 @@ function value(d) {
 
 
 
-###### <sub>Documentation generated on Fri, 28 Sep 2018 17:04:12 GMT</sub>
+###### <sub>Documentation generated on Fri, 28 Sep 2018 17:24:19 GMT</sub>
