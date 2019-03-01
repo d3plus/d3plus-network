@@ -27,9 +27,9 @@
     "d3-force": "^1.1.2",
     "d3-sankey": "^0.7.1",
     "d3-scale": "^2.1.2",
-    "d3plus-common": "^0.6.43",
-    "d3plus-shape": "^0.16.0",
-    "d3plus-viz": "^0.12.3"
+    "d3plus-common": "^0.6.45",
+    "d3plus-shape": "^0.16.2",
+    "d3plus-viz": "^0.12.10"
   },
   "scripts": {
     "build": "d3plus-build",
