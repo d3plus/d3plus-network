@@ -28,6 +28,9 @@ export default class Rings extends Viz {
 
     super();
     this._links = [];
+    this._linkSize = constant(1);
+    this._linkSizeMin = 1;
+    this._linkSizeScale = "sqrt";
     this._noDataMessage = false;
     this._nodes = [];
     this._on.mouseenter = () => {};
@@ -145,10 +148,12 @@ export default class Rings extends Viz {
 
     const links = this._links.map(link => {
       const check = ["source", "target"];
-      return check.reduce((result, check) => {
+      const edge = check.reduce((result, check) => {
         result[check] = typeof link[check] === "number" ? nodes[link[check]] : nodeLookup[link[check].id || link[check]];
         return result;
       }, {});
+      edge.size = this._linkSize(link);
+      return edge;
     });
 
     const linkMap = links.reduce((map, link) => {
@@ -416,8 +421,20 @@ export default class Rings extends Viz {
       return obj;
     }, {});
 
+    const strokeExtent = extent(links, d => d.size);
+    if (strokeExtent[0] !== strokeExtent[1]) {
+      const radius = min(nodes, d => d.r);
+      const strokeScale = scales[`scale${this._linkSizeScale.charAt(0).toUpperCase()}${this._linkSizeScale.slice(1)}`]()
+        .domain(strokeExtent)
+        .range([this._linkSizeMin, radius]);
+      links.forEach(link => {
+        link.size = strokeScale(link.size);
+      });
+    }
+
     this._shapes.push(new shapes.Path()
       .config(configPrep.bind(this)(this._shapeConfig, "edge", "Path"))
+      .strokeWidth(d => d.size)
       .id(d => `${d.source.id}_${d.target.id}`)
       .d(d => d.spline ? `M${d.sourceX},${d.sourceY}C${d.sourceBisectX},${d.sourceBisectY} ${d.targetBisectX},${d.targetBisectY} ${d.targetX},${d.targetY}` : `M${d.source.x},${d.source.y} ${d.target.x},${d.target.y}`)
       .data(edges)
@@ -498,6 +515,36 @@ The value passed should either be an *Array* of data or a *String* representing 
       return this;
     }
     return this._links;
+  }
+
+  /**
+      @memberof Network
+      @desc Defines the thickness of the links connecting each node. The value provided can be either a pixel Number to be used for all links, or an accessor function that returns a specific data value to be used in an automatically calculated linear scale.
+      @param {Function|Name} [*value* = 1]
+      @chainable
+  */
+  linkSize(_) {
+    return arguments.length ? (this._linkSize = typeof _ === "function" ? _ : constant(_), this) : this._linkSize;
+  }
+
+  /**
+      @memberof Network
+      @desc Defines the minimum pixel stroke width used in link sizing.
+      @param {Number} [*value* = 2]
+      @chainable
+  */
+  linkSizeMin(_) {
+    return arguments.length ? (this._linkSizeMin = _, this) : this._linkSizeMin;
+  }
+
+  /**
+      @memberof Network
+      @desc Sets the specific type of [continuous d3-scale](https://github.com/d3/d3-scale#continuous-scales) used when calculating the pixel size of links in the network.
+      @param {String} [*value* = "sqrt"]
+      @chainable
+  */
+  linkSizeScale(_) {
+    return arguments.length ? (this._linkSizeScale = _, this) : this._linkSizeScale;
   }
 
   /**

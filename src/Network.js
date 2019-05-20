@@ -29,6 +29,9 @@ export default class Network extends Viz {
 
     super();
     this._links = [];
+    this._linkSize = constant(1);
+    this._linkSizeMin = 1;
+    this._linkSizeScale = "sqrt";
     this._noDataMessage = false;
     this._nodes = [];
     this._on["click.shape"] = (d, i) => {
@@ -157,8 +160,7 @@ export default class Network extends Viz {
       Path: {
         fill: "none",
         label: false,
-        stroke: "#eee",
-        strokeWidth: 1
+        stroke: "#eee"
       }
     });
     this._x = accessor("x");
@@ -287,6 +289,7 @@ export default class Network extends Viz {
 
     const nodeIndices = nodes.map(n => n.node);
     const links = this._links.map(l => ({
+      size: this._linkSize(l),
       source: typeof l.source === "number"
         ? nodes[nodeIndices.indexOf(this._nodes[l.source])]
         : nodeLookup[l.source.id],
@@ -342,9 +345,22 @@ export default class Network extends Viz {
         .attr("class", "d3plus-network-zoomGroup")
       .merge(this._zoomGroup);
 
+    const strokeExtent = extent(links, d => d.size);
+    if (strokeExtent[0] !== strokeExtent[1]) {
+      const strokeScale = scales[`scale${this._linkSizeScale.charAt(0).toUpperCase()}${this._linkSizeScale.slice(1)}`]()
+        .domain(strokeExtent)
+        .range([this._linkSizeMin, r.range()[0]]);
+      links.forEach(link => {
+        link.size = strokeScale(link.size);
+      });
+    }
+
     this._shapes.push(new shapes.Path()
-      .config(this._shapeConfig)
-      .config(this._shapeConfig.Path)
+      .config(configPrep.bind(this)(this._shapeConfig, "edge", "Path"))
+      .strokeWidth(d => d.size)
+      .activeStyle({
+        "stroke-width": d => d.size
+      })
       .d(d => `M${d.source.x},${d.source.y} ${d.target.x},${d.target.y}`)
       .data(links)
       .select(elem("g.d3plus-network-links", {parent, transition, enter: {transform}, update: {transform}}).node())
@@ -389,6 +405,36 @@ The value passed should either be an *Array* of data or a *String* representing 
       return this;
     }
     return this._links;
+  }
+
+  /**
+      @memberof Network
+      @desc Defines the thickness of the links connecting each node. The value provided can be either a pixel Number to be used for all links, or an accessor function that returns a specific data value to be used in an automatically calculated linear scale.
+      @param {Function|Name} [*value* = 1]
+      @chainable
+  */
+  linkSize(_) {
+    return arguments.length ? (this._linkSize = typeof _ === "function" ? _ : constant(_), this) : this._linkSize;
+  }
+
+  /**
+      @memberof Network
+      @desc Defines the minimum pixel stroke width used in link sizing.
+      @param {Number} [*value* = 2]
+      @chainable
+  */
+  linkSizeMin(_) {
+    return arguments.length ? (this._linkSizeMin = _, this) : this._linkSizeMin;
+  }
+
+  /**
+      @memberof Network
+      @desc Sets the specific type of [continuous d3-scale](https://github.com/d3/d3-scale#continuous-scales) used when calculating the pixel size of links in the network.
+      @param {String} [*value* = "sqrt"]
+      @chainable
+  */
+  linkSizeScale(_) {
+    return arguments.length ? (this._linkSizeScale = _, this) : this._linkSizeScale;
   }
 
   /**
@@ -446,7 +492,7 @@ Additionally, a custom formatting function can be passed as a second argument to
 
   /**
       @memberof Network
-      @desc If *value* is specified, sets the size scale maximum to the specified number and returns the current class instance. If *value* is not specified, returns the current size scale maximum. By default, the maximum size is determined by half the distance of the two closest nodes.
+      @desc Defines the maximum pixel radius used in size scaling. By default, the maximum size is determined by half the distance of the two closest nodes.
       @param {Number} [*value*]
       @chainable
   */
@@ -456,7 +502,7 @@ Additionally, a custom formatting function can be passed as a second argument to
 
   /**
       @memberof Network
-      @desc If *value* is specified, sets the size scale minimum to the specified number and returns the current class instance. If *value* is not specified, returns the current size scale minimum.
+      @desc Defines the minimum pixel radius used in size scaling.
       @param {Number} [*value* = 5]
       @chainable
   */
@@ -466,7 +512,7 @@ Additionally, a custom formatting function can be passed as a second argument to
 
   /**
       @memberof Network
-      @desc If *value* is specified, sets the size scale to the specified string and returns the current class instance. If *value* is not specified, returns the current size scale.
+      @desc Sets the specific type of [continuous d3-scale](https://github.com/d3/d3-scale#continuous-scales) used when calculating the pixel size of nodes in the network.
       @param {String} [*value* = "sqrt"]
       @chainable
   */
