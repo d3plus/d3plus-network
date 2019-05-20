@@ -27,7 +27,6 @@ export default class Rings extends Viz {
   constructor() {
 
     super();
-    this._labelCutoff = 100;
     this._links = [];
     this._noDataMessage = false;
     this._nodes = [];
@@ -428,7 +427,7 @@ export default class Rings extends Viz {
     const that = this;
 
     const shapeConfig = {
-      label: d => nodes.length <= this._labelCutoff || (this._hover && this._hover(d) || this._active && this._active(d)) ? this._drawLabel(d.data || d.node, d.i) : false,
+      label: d => nodes.length <= this._dataCutoff || (this._hover && this._hover(d) || this._active && this._active(d)) ? this._drawLabel(d.data || d.node, d.i) : false,
       labelBounds: d => d.labelBounds,
       labelConfig: {
         fontColor: d => d.id === this._center ? configPrep.bind(that)(that._shapeConfig, "shape", d.key).labelConfig.fontColor(d) : colorLegible(configPrep.bind(that)(that._shapeConfig, "shape", d.key).fill(d)),

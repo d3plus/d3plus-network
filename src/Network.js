@@ -28,7 +28,6 @@ export default class Network extends Viz {
   constructor() {
 
     super();
-    this._labelCutoff = 100;
     this._links = [];
     this._noDataMessage = false;
     this._nodes = [];
@@ -352,7 +351,7 @@ export default class Network extends Viz {
       .render());
 
     const shapeConfig = {
-      label: d => nodes.length <= this._labelCutoff || (this._hover && this._hover(d) || this._active && this._active(d)) ? this._drawLabel(d.data || d.node, d.i) : false,
+      label: d => nodes.length <= this._dataCutoff || (this._hover && this._hover(d) || this._active && this._active(d)) ? this._drawLabel(d.data || d.node, d.i) : false,
       select: elem("g.d3plus-network-nodes", {parent, transition, enter: {transform}, update: {transform}}).node()
     };
 
@@ -367,16 +366,6 @@ export default class Network extends Viz {
 
     return this;
 
-  }
-
-  /**
-      @memberof Network
-      @desc Defines the maximum number of nodes that allow all labels to be shown. When the number of nodes is over this amount, labels will only be shown on hover and click.
-      @param {Number} *value* = 100
-      @chainable
-  */
-  labelCutoff(_) {
-    return arguments.length ? (this._labelCutoff = _, this) : this._labelCutoff;
   }
 
   /**
