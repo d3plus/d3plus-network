@@ -355,8 +355,11 @@ export default class Network extends Viz {
       });
     }
 
+    const linkConfig = configPrep.bind(this)(this._shapeConfig, "edge", "Path");
+    delete linkConfig.on;
+
     this._shapes.push(new shapes.Path()
-      .config(configPrep.bind(this)(this._shapeConfig, "edge", "Path"))
+      .config(linkConfig)
       .strokeWidth(d => d.size)
       .activeStyle({
         "stroke-width": d => d.size

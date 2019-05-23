@@ -432,8 +432,11 @@ export default class Rings extends Viz {
       });
     }
 
+    const linkConfig = configPrep.bind(this)(this._shapeConfig, "edge", "Path");
+    delete linkConfig.on;
+
     this._shapes.push(new shapes.Path()
-      .config(configPrep.bind(this)(this._shapeConfig, "edge", "Path"))
+      .config(linkConfig)
       .strokeWidth(d => d.size)
       .id(d => `${d.source.id}_${d.target.id}`)
       .d(d => d.spline ? `M${d.sourceX},${d.sourceY}C${d.sourceBisectX},${d.sourceBisectY} ${d.targetBisectX},${d.targetBisectY} ${d.targetX},${d.targetY}` : `M${d.source.x},${d.source.y} ${d.target.x},${d.target.y}`)
