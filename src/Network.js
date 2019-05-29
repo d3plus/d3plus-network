@@ -40,7 +40,9 @@ export default class Network extends Viz {
 
       if (this._hover && this._drawDepth >= this._groupBy.length - 1) {
 
-        if (this._focus && this._focus === d.id) {
+        const id = `${this._nodeGroupBy && this._nodeGroupBy[this._drawDepth](d, i) ? this._nodeGroupBy[this._drawDepth](d, i) : this._id(d, i)}`;
+
+        if (this._focus && this._focus === id) {
 
           this.active(false);
           this._on.mouseenter.bind(this)(d, i);
@@ -53,8 +55,7 @@ export default class Network extends Viz {
 
           this.hover(false);
 
-          const id = `${this._nodeGroupBy && this._nodeGroupBy[this._drawDepth](d, i) ? this._nodeGroupBy[this._drawDepth](d, i) : this._id(d, i)}`,
-                links = this._linkLookup[id],
+          const links = this._linkLookup[id],
                 node = this._nodeLookup[id];
 
           const filterIds = [id];
@@ -74,7 +75,7 @@ export default class Network extends Viz {
             else return filterIds.includes(`${this._ids(h, x)[this._drawDepth]}`);
           });
 
-          this._focus = d.id;
+          this._focus = id;
           const t = zoomTransform(this._container.node());
           xDomain = xDomain.map(d => d * t.k + t.x);
           yDomain = yDomain.map(d => d * t.k + t.y);
@@ -96,7 +97,6 @@ export default class Network extends Viz {
         if (this._focus && this._focus === ids) {
 
           this.active(false);
-          this._on.mouseenter.bind(this)(d, i);
 
           this._focus = undefined;
           this._zoomToBounds(null);
@@ -136,10 +136,39 @@ export default class Network extends Viz {
 
         }
 
+        this._on.mouseenter.bind(this)(d, i);
         this._on["mousemove.legend"].bind(this)(d, i);
 
       }
 
+    };
+    this._on.mouseenter = () => {};
+    this._on["mouseleave.shape"] = () => {
+      this.hover(false);
+    };
+    const defaultMouseMove = this._on["mousemove.shape"];
+    this._on["mousemove.shape"] = (d, i) => {
+      defaultMouseMove(d, i);
+      const id = `${this._nodeGroupBy && this._nodeGroupBy[this._drawDepth](d, i) ? this._nodeGroupBy[this._drawDepth](d, i) : this._id(d, i)}`,
+            links = this._linkLookup[id],
+            node = this._nodeLookup[id];
+
+      const filterIds = [id];
+      const xDomain = [node.x - node.r, node.x + node.r],
+            yDomain = [node.y - node.r, node.y + node.r];
+
+      links.forEach(l => {
+        filterIds.push(l.id);
+        if (l.x - l.r < xDomain[0]) xDomain[0] = l.x - l.r;
+        if (l.x + l.r > xDomain[1]) xDomain[1] = l.x + l.r;
+        if (l.y - l.r < yDomain[0]) yDomain[0] = l.y - l.r;
+        if (l.y + l.r > yDomain[1]) yDomain[1] = l.y + l.r;
+      });
+
+      this.hover((h, x) => {
+        if (h.source && h.target) return h.source.id === id || h.target.id === id;
+        else return filterIds.includes(`${this._ids(h, x)[this._drawDepth]}`);
+      });
     };
     this._sizeMin = 5;
     this._sizeScale = "sqrt";
@@ -385,6 +414,23 @@ export default class Network extends Viz {
 
     return this;
 
+  }
+
+  /**
+      @memberof Network
+      @desc If *value* is specified, sets the hover method to the specified function and returns the current class instance.
+      @param {Function} [*value*]
+      @chainable
+   */
+  hover(_) {
+    this._hover = _;
+
+    if (this._nodes.length < this._dataCutoff) {
+      this._shapes.forEach(s => s.hover(_));
+      if (this._legend) this._legendClass.hover(_);
+    }
+
+    return this;
   }
 
   /**
