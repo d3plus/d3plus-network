@@ -53,11 +53,11 @@ export default class Network extends Viz {
 
           this.hover(false);
 
-          const id = this._nodeGroupBy && this._nodeGroupBy[this._drawDepth](d, i) ? this._nodeGroupBy[this._drawDepth](d, i) : this._id(d, i),
+          const id = `${this._nodeGroupBy && this._nodeGroupBy[this._drawDepth](d, i) ? this._nodeGroupBy[this._drawDepth](d, i) : this._id(d, i)}`,
                 links = this._linkLookup[id],
                 node = this._nodeLookup[id];
 
-          const filterIds = [node.id];
+          const filterIds = [id];
           let xDomain = [node.x - node.r, node.x + node.r],
               yDomain = [node.y - node.r, node.y + node.r];
 
@@ -70,8 +70,8 @@ export default class Network extends Viz {
           });
 
           this.active((h, x) => {
-            if (h.source && h.target) return h.source.id === node.id || h.target.id === node.id;
-            else return filterIds.includes(this._ids(h, x)[this._drawDepth]);
+            if (h.source && h.target) return h.source.id === id || h.target.id === id;
+            else return filterIds.includes(`${this._ids(h, x)[this._drawDepth]}`);
           });
 
           this._focus = d.id;
@@ -108,7 +108,7 @@ export default class Network extends Viz {
 
           const nodes = ids.map(id => this._nodeLookup[id]);
 
-          const filterIds = [id];
+          const filterIds = [`${id}`];
           let xDomain = [nodes[0].x - nodes[0].r, nodes[0].x + nodes[0].r],
               yDomain = [nodes[0].y - nodes[0].r, nodes[0].y + nodes[0].r];
 
@@ -124,7 +124,7 @@ export default class Network extends Viz {
             if (h.source && h.target) return filterIds.includes(h.source.id) && filterIds.includes(h.target.id);
             else {
               const myIds = this._ids(h, x);
-              return filterIds.includes(myIds[myIds.length - 1]);
+              return filterIds.includes(`${myIds[myIds.length - 1]}`);
             }
           });
 
