@@ -1,6 +1,6 @@
 # d3plus-network
 
-[![NPM Release](http://img.shields.io/npm/v/d3plus-network.svg?style=flat)](https://www.npmjs.org/package/d3plus-network) [![Build Status](https://travis-ci.org/d3plus/d3plus-network.svg?branch=master)](https://travis-ci.org/d3plus/d3plus-network) [![Dependency Status](http://img.shields.io/david/d3plus/d3plus-network.svg?style=flat)](https://david-dm.org/d3plus/d3plus-network) [![Gitter](https://img.shields.io/badge/-chat_on_gitter-brightgreen.svg?style=flat&logo=gitter-white)](https://gitter.im/d3plus/) [![1.0 progress](https://img.shields.io/badge/1.0_progress-33%25-orange.svg?style=flat)](https://github.com/d3plus/d3plus-network/projects/1)
+[![NPM Release](http://img.shields.io/npm/v/d3plus-network.svg?style=flat)](https://www.npmjs.org/package/d3plus-network) [![Build Status](https://travis-ci.org/d3plus/d3plus-network.svg?branch=master)](https://travis-ci.org/d3plus/d3plus-network) [![Dependency Status](http://img.shields.io/david/d3plus/d3plus-network.svg?style=flat)](https://david-dm.org/d3plus/d3plus-network) [![Gitter](https://img.shields.io/badge/-chat_on_gitter-brightgreen.svg?style=flat&logo=gitter-white)](https://gitter.im/d3plus/) [![1.0 progress](https://img.shields.io/badge/1.0_progress-67%25-yellow.svg?style=flat)](https://github.com/d3plus/d3plus-network/projects/1)
 
 Javascript network visualizations built upon d3 modules.
 
@@ -61,6 +61,7 @@ new d3plus.Network()
 
 ### More Examples
 
+ * [Force Directed Network](http://d3plus.org/examples/d3plus-network/force-network/)<sup> ***New***</sup>
  * [Simple Sankey Diagram](http://d3plus.org/examples/d3plus-network/sankey-diagram/)
  * [Simple Rings](http://d3plus.org/examples/d3plus-network/simple-rings/)
 
@@ -74,7 +75,7 @@ new d3plus.Network()
 ---
 
 <a name="Network"></a>
-#### **Network** [<>](https://github.com/d3plus/d3plus-network/blob/master/src/Network.js#L16)
+#### **Network** [<>](https://github.com/d3plus/d3plus-network/blob/master/src/Network.js#L17)
 
 
 This is a global class, and extends all of the methods and functionality of [<code>Viz</code>](https://github.com/d3plus/d3plus-viz#Viz).
@@ -108,7 +109,7 @@ Creates a network visualization based on a defined set of nodes and edges. [Clic
 
 
 
-<a name="Network.hover" href="#Network.hover">#</a> Network.**hover**([*value*]) [<>](https://github.com/d3plus/d3plus-network/blob/master/src/Network.js#L425)
+<a name="Network.hover" href="#Network.hover">#</a> Network.**hover**([*value*]) [<>](https://github.com/d3plus/d3plus-network/blob/master/src/Network.js#L470)
 
 If *value* is specified, sets the hover method to the specified function and returns the current class instance.
 
@@ -116,7 +117,7 @@ If *value* is specified, sets the hover method to the specified function and ret
 This is a static method of [<code>Network</code>](#Network), and is chainable with other methods of this Class.
 
 
-<a name="Network.links" href="#Network.links">#</a> Network.**links**(*links*, [*formatter*]) [<>](https://github.com/d3plus/d3plus-network/blob/master/src/Network.js#L448)
+<a name="Network.links" href="#Network.links">#</a> Network.**links**(*links*, [*formatter*]) [<>](https://github.com/d3plus/d3plus-network/blob/master/src/Network.js#L493)
 
 A predefined *Array* of edges that connect each object passed to the [node](#Network.node) method. The `source` and `target` keys in each link need to map to the nodes in one of three ways:
 1. The index of the node in the nodes array (as in [this](http://d3plus.org/examples/d3plus-network/getting-started/) example).
@@ -135,7 +136,7 @@ This is a static method of [<code>Network</code>](#Network), and is chainable wi
 
 
 
-<a name="Network.linkSize" href="#Network.linkSize">#</a> Network.**linkSize**([*value*]) [<>](https://github.com/d3plus/d3plus-network/blob/master/src/Network.js#L465)
+<a name="Network.linkSize" href="#Network.linkSize">#</a> Network.**linkSize**([*value*]) [<>](https://github.com/d3plus/d3plus-network/blob/master/src/Network.js#L510)
 
 Defines the thickness of the links connecting each node. The value provided can be either a pixel Number to be used for all links, or an accessor function that returns a specific data value to be used in an automatically calculated linear scale.
 
@@ -143,7 +144,7 @@ Defines the thickness of the links connecting each node. The value provided can 
 This is a static method of [<code>Network</code>](#Network), and is chainable with other methods of this Class.
 
 
-<a name="Network.linkSizeMin" href="#Network.linkSizeMin">#</a> Network.**linkSizeMin**([*value*]) [<>](https://github.com/d3plus/d3plus-network/blob/master/src/Network.js#L475)
+<a name="Network.linkSizeMin" href="#Network.linkSizeMin">#</a> Network.**linkSizeMin**([*value*]) [<>](https://github.com/d3plus/d3plus-network/blob/master/src/Network.js#L520)
 
 Defines the minimum pixel stroke width used in link sizing.
 
@@ -151,7 +152,7 @@ Defines the minimum pixel stroke width used in link sizing.
 This is a static method of [<code>Network</code>](#Network), and is chainable with other methods of this Class.
 
 
-<a name="Network.linkSizeScale" href="#Network.linkSizeScale">#</a> Network.**linkSizeScale**([*value*]) [<>](https://github.com/d3plus/d3plus-network/blob/master/src/Network.js#L485)
+<a name="Network.linkSizeScale" href="#Network.linkSizeScale">#</a> Network.**linkSizeScale**([*value*]) [<>](https://github.com/d3plus/d3plus-network/blob/master/src/Network.js#L530)
 
 Sets the specific type of [continuous d3-scale](https://github.com/d3/d3-scale#continuous-scales) used when calculating the pixel size of links in the network.
 
@@ -159,7 +160,7 @@ Sets the specific type of [continuous d3-scale](https://github.com/d3/d3-scale#c
 This is a static method of [<code>Network</code>](#Network), and is chainable with other methods of this Class.
 
 
-<a name="Network.nodeGroupBy" href="#Network.nodeGroupBy">#</a> Network.**nodeGroupBy**([*value*]) [<>](https://github.com/d3plus/d3plus-network/blob/master/src/Network.js#L495)
+<a name="Network.nodeGroupBy" href="#Network.nodeGroupBy">#</a> Network.**nodeGroupBy**([*value*]) [<>](https://github.com/d3plus/d3plus-network/blob/master/src/Network.js#L540)
 
 If *value* is specified, sets the node group accessor(s) to the specified string, function, or array of values and returns the current class instance. This method overrides the default .groupBy() function from being used with the data passed to .nodes(). If *value* is not specified, returns the current node group accessor.
 
@@ -167,7 +168,7 @@ If *value* is specified, sets the node group accessor(s) to the specified string
 This is a static method of [<code>Network</code>](#Network), and is chainable with other methods of this Class.
 
 
-<a name="Network.nodes" href="#Network.nodes">#</a> Network.**nodes**(*nodes*, [*formatter*]) [<>](https://github.com/d3plus/d3plus-network/blob/master/src/Network.js#L521)
+<a name="Network.nodes" href="#Network.nodes">#</a> Network.**nodes**(*nodes*, [*formatter*]) [<>](https://github.com/d3plus/d3plus-network/blob/master/src/Network.js#L566)
 
 The list of nodes to be used for drawing the network. The value passed should either be an *Array* of data or a *String* representing a filepath or URL to be loaded.
 
@@ -183,7 +184,7 @@ This is a static method of [<code>Network</code>](#Network), and is chainable wi
 
 
 
-<a name="Network.size" href="#Network.size">#</a> Network.**size**([*value*]) [<>](https://github.com/d3plus/d3plus-network/blob/master/src/Network.js#L538)
+<a name="Network.size" href="#Network.size">#</a> Network.**size**([*value*]) [<>](https://github.com/d3plus/d3plus-network/blob/master/src/Network.js#L583)
 
 If *value* is specified, sets the size accessor to the specified function or data key and returns the current class instance. If *value* is not specified, returns the current size accessor.
 
@@ -191,7 +192,7 @@ If *value* is specified, sets the size accessor to the specified function or dat
 This is a static method of [<code>Network</code>](#Network), and is chainable with other methods of this Class.
 
 
-<a name="Network.sizeMax" href="#Network.sizeMax">#</a> Network.**sizeMax**([*value*]) [<>](https://github.com/d3plus/d3plus-network/blob/master/src/Network.js#L548)
+<a name="Network.sizeMax" href="#Network.sizeMax">#</a> Network.**sizeMax**([*value*]) [<>](https://github.com/d3plus/d3plus-network/blob/master/src/Network.js#L593)
 
 Defines the maximum pixel radius used in size scaling. By default, the maximum size is determined by half the distance of the two closest nodes.
 
@@ -199,7 +200,7 @@ Defines the maximum pixel radius used in size scaling. By default, the maximum s
 This is a static method of [<code>Network</code>](#Network), and is chainable with other methods of this Class.
 
 
-<a name="Network.sizeMin" href="#Network.sizeMin">#</a> Network.**sizeMin**([*value*]) [<>](https://github.com/d3plus/d3plus-network/blob/master/src/Network.js#L558)
+<a name="Network.sizeMin" href="#Network.sizeMin">#</a> Network.**sizeMin**([*value*]) [<>](https://github.com/d3plus/d3plus-network/blob/master/src/Network.js#L603)
 
 Defines the minimum pixel radius used in size scaling.
 
@@ -207,7 +208,7 @@ Defines the minimum pixel radius used in size scaling.
 This is a static method of [<code>Network</code>](#Network), and is chainable with other methods of this Class.
 
 
-<a name="Network.sizeScale" href="#Network.sizeScale">#</a> Network.**sizeScale**([*value*]) [<>](https://github.com/d3plus/d3plus-network/blob/master/src/Network.js#L568)
+<a name="Network.sizeScale" href="#Network.sizeScale">#</a> Network.**sizeScale**([*value*]) [<>](https://github.com/d3plus/d3plus-network/blob/master/src/Network.js#L613)
 
 Sets the specific type of [continuous d3-scale](https://github.com/d3/d3-scale#continuous-scales) used when calculating the pixel size of nodes in the network.
 
@@ -215,7 +216,7 @@ Sets the specific type of [continuous d3-scale](https://github.com/d3/d3-scale#c
 This is a static method of [<code>Network</code>](#Network), and is chainable with other methods of this Class.
 
 
-<a name="Network.x" href="#Network.x">#</a> Network.**x**([*value*]) [<>](https://github.com/d3plus/d3plus-network/blob/master/src/Network.js#L578)
+<a name="Network.x" href="#Network.x">#</a> Network.**x**([*value*]) [<>](https://github.com/d3plus/d3plus-network/blob/master/src/Network.js#L623)
 
 If *value* is specified, sets the x accessor to the specified function or string matching a key in the data and returns the current class instance. The data passed to .data() takes priority over the .nodes() data array. If *value* is not specified, returns the current x accessor. By default, the x and y positions are determined dynamically based on default force layout properties.
 
@@ -223,7 +224,7 @@ If *value* is specified, sets the x accessor to the specified function or string
 This is a static method of [<code>Network</code>](#Network), and is chainable with other methods of this Class.
 
 
-<a name="Network.y" href="#Network.y">#</a> Network.**y**([*value*]) [<>](https://github.com/d3plus/d3plus-network/blob/master/src/Network.js#L596)
+<a name="Network.y" href="#Network.y">#</a> Network.**y**([*value*]) [<>](https://github.com/d3plus/d3plus-network/blob/master/src/Network.js#L641)
 
 If *value* is specified, sets the y accessor to the specified function or string matching a key in the data and returns the current class instance. The data passed to .data() takes priority over the .nodes() data array. If *value* is not specified, returns the current y accessor. By default, the x and y positions are determined dynamically based on default force layout properties.
 
@@ -482,4 +483,4 @@ function value(d) {
 
 
 
-###### <sub>Documentation generated on Thu, 11 Jul 2019 13:27:35 GMT</sub>
+###### <sub>Documentation generated on Thu, 25 Jul 2019 12:39:11 GMT</sub>
