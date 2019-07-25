@@ -3,9 +3,10 @@
     @see https://github.com/d3plus/d3plus-viz#Viz
 */
 
-import {extent, mean, min, merge} from "d3-array";
+import {extent, max, mean, min, merge} from "d3-array";
 import {nest} from "d3-collection";
-// import {forceSimulation} from "d3-force";
+import {forceLink, forceManyBody, forceSimulation} from "d3-force";
+import {polygonHull} from "d3-polygon";
 import * as scales from "d3-scale";
 import {zoomTransform} from "d3-zoom";
 
@@ -242,6 +243,70 @@ export default class Network extends Viz {
 
     }).filter(n => n);
 
+    const nodeLookup = this._nodeLookup = nodes.reduce((obj, d) => {
+      obj[d.id] = d;
+      return obj;
+    }, {});
+
+    const nodeIndices = nodes.map(n => n.node);
+    const links = this._links.map(l => ({
+      size: this._linkSize(l),
+      source: typeof l.source === "number"
+        ? nodes[nodeIndices.indexOf(this._nodes[l.source])]
+        : nodeLookup[l.source.id],
+      target: typeof l.target === "number"
+        ? nodes[nodeIndices.indexOf(this._nodes[l.target])]
+        : nodeLookup[l.target.id]
+    }));
+
+    this._linkLookup = links.reduce((obj, d) => {
+      if (!obj[d.source.id]) obj[d.source.id] = [];
+      obj[d.source.id].push(d.target);
+      if (!obj[d.target.id]) obj[d.target.id] = [];
+      obj[d.target.id].push(d.source);
+      return obj;
+    }, {});
+
+    const missingCoords = nodes.some(n => n.fx === undefined || n.fy === undefined);
+
+    if (missingCoords) {
+
+      const linkStrength = scales.scaleLinear()
+        .domain(extent(links, d => d.size))
+        .range([0.1, 0.5]);
+
+      const simulation = forceSimulation()
+        .force("link", forceLink(links)
+          .id(d => d.id)
+          .distance(1)
+          .strength(d => linkStrength(d.size))
+          .iterations(4)
+        )
+        .force("charge", forceManyBody().strength(-1))
+        .stop();
+
+      const iterations = 300;
+      const alphaMin = 0.001;
+      const alphaDecay = 1 - Math.pow(alphaMin, 1 / iterations);
+      simulation.velocityDecay(0);
+      simulation.alphaMin(alphaMin);
+      simulation.alphaDecay(alphaDecay);
+      simulation.alphaDecay(0);
+
+      simulation.nodes(nodes);
+      simulation.tick(iterations).stop();
+
+      const hull = polygonHull(nodes.map(n => [n.vx, n.vy]));
+      const {angle, cx, cy} = shapes.largestRect(hull);
+
+      nodes.forEach(n => {
+        const p = shapes.pointRotate([n.vx, n.vy], -1 * (Math.PI / 180 * angle), [cx, cy]);
+        n.fx = p[0];
+        n.fy = p[1];
+      });
+
+    }
+
     const xExtent = extent(nodes.map(n => n.fx)),
           yExtent = extent(nodes.map(n => n.fy));
 
@@ -266,13 +331,13 @@ export default class Network extends Viz {
     });
 
     const rExtent = extent(nodes.map(n => n.r));
-    let rMax = this._sizeMax || min(
+    let rMax = this._sizeMax || max([1, min(
       merge(nodes
         .map(n1 => nodes
           .map(n2 => n1 === n2 ? null : shapes.pointDistance([n1.x, n1.y], [n2.x, n2.y]))
         )
       )
-    ) / 2;
+    ) / 2]);
 
     const r = scales[`scale${this._sizeScale.charAt(0).toUpperCase()}${this._sizeScale.slice(1)}`]()
                 .domain(rExtent).range([rExtent[0] === rExtent[1] ? rMax : min([rMax / 2, this._sizeMin]), rMax]),
@@ -307,33 +372,6 @@ export default class Network extends Viz {
       n.width = n.r * 2;
       n.height = n.r * 2;
     });
-
-    const nodeLookup = this._nodeLookup = nodes.reduce((obj, d) => {
-      obj[d.id] = d;
-      return obj;
-    }, {});
-
-    // forceSimulation(nodes)
-    //   .on("tick", () => this._shapes.forEach(s => s.render()));
-
-    const nodeIndices = nodes.map(n => n.node);
-    const links = this._links.map(l => ({
-      size: this._linkSize(l),
-      source: typeof l.source === "number"
-        ? nodes[nodeIndices.indexOf(this._nodes[l.source])]
-        : nodeLookup[l.source.id],
-      target: typeof l.target === "number"
-        ? nodes[nodeIndices.indexOf(this._nodes[l.target])]
-        : nodeLookup[l.target.id]
-    }));
-
-    this._linkLookup = links.reduce((obj, d) => {
-      if (!obj[d.source.id]) obj[d.source.id] = [];
-      obj[d.source.id].push(d.target);
-      if (!obj[d.target.id]) obj[d.target.id] = [];
-      obj[d.target.id].push(d.source);
-      return obj;
-    }, {});
 
     this._container = this._select.selectAll("svg.d3plus-network").data([0]);
 
