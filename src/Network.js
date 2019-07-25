@@ -249,15 +249,22 @@ export default class Network extends Viz {
     }, {});
 
     const nodeIndices = nodes.map(n => n.node);
-    const links = this._links.map(l => ({
-      size: this._linkSize(l),
-      source: typeof l.source === "number"
-        ? nodes[nodeIndices.indexOf(this._nodes[l.source])]
-        : nodeLookup[l.source.id],
-      target: typeof l.target === "number"
-        ? nodes[nodeIndices.indexOf(this._nodes[l.target])]
-        : nodeLookup[l.target.id]
-    }));
+    const links = this._links.map(l => {
+      const referenceType = typeof l.source;
+      return {
+        size: this._linkSize(l),
+        source: referenceType === "number"
+          ? nodes[nodeIndices.indexOf(this._nodes[l.source])]
+          : referenceType === "string"
+            ? nodeLookup[l.source]
+            : nodeLookup[l.source.id],
+        target: referenceType === "number"
+          ? nodes[nodeIndices.indexOf(this._nodes[l.target])]
+          : referenceType === "string"
+            ? nodeLookup[l.target]
+            : nodeLookup[l.target.id]
+      };
+    });
 
     this._linkLookup = links.reduce((obj, d) => {
       if (!obj[d.source.id]) obj[d.source.id] = [];
