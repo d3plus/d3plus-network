@@ -115,12 +115,11 @@ export default class Sankey extends Viz {
     const height = this._height - this._margin.top - this._margin.bottom,
           width = this._width - this._margin.left - this._margin.right;
 
-    console.log(this._links);
     const _nodes = Array.isArray(this._nodes)
       ? this._nodes
       : this._links.reduce((all, d) => {
-        if (!all.includes(d.source)) all.push(d[this._linksSource]);
-        if (!all.includes(d.target)) all.push(d[this._linksTarget]);
+        if (!all.includes(d[this._linksSource])) all.push(d[this._linksSource]);
+        if (!all.includes(d[this._linksTarget])) all.push(d[this._linksTarget]);
         return all;
       }, []).map(id => ({id}));
 
@@ -246,25 +245,21 @@ The value passed should be an *Array* of data. An optional formatting function c
   /**
       @memberof Sankey
       @desc Sets the source's node name.
-      @param {Function|String} [*value* = "source"]
+      @param {String} [*value* = "source"]
       @chainable
   */
   linksSource(_) {
-    return arguments.length
-      ? (this._linksSource = typeof _ === "function" ? _ : accessor(_), this)
-      : this._linksSource;
+    return arguments.length ? (this._linksSource = _, this) : this._linksSource;
   }
 
   /**
       @memberof Sankey
       @desc Sets the target's node name.
-      @param {Function|String} [*value* = "target"]
+      @param {String} [*value* = "target"]
       @chainable
   */
   linksTarget(_) {
-    return arguments.length
-      ? (this._linksTarget = typeof _ === "function" ? _ : accessor(_), this)
-      : this._linksTarget;
+    return arguments.length ? (this._linksTarget = _, this) : this._linksTarget;
   }
 
   /**
