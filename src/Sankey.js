@@ -139,10 +139,7 @@ export default class Sankey extends Viz {
     const links = this._links.map((link, i) => {
       const check = ["source", "target"];
       const linkLookup = check.reduce((result, item) => {
-        result[item] =
-          typeof link[item] === "number"
-            ? nodeLookup[link[item]]
-            : nodeLookup[link[item]];
+        result[item] = nodeLookup[link[item]];
         return result;
       }, {});
       return {
