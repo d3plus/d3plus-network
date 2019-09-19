@@ -40,6 +40,8 @@ export default class Sankey extends Viz {
     super();
     this._nodeId = accessor("id");
     this._links = accessor("links");
+    this._linksSource = "source";
+    this._linksTarget = "target";
     this._noDataMessage = false;
     this._nodes = accessor("nodes");
     this._nodeAlign = sankeyAligns.justify;
@@ -113,11 +115,12 @@ export default class Sankey extends Viz {
     const height = this._height - this._margin.top - this._margin.bottom,
           width = this._width - this._margin.left - this._margin.right;
 
+    console.log(this._links);
     const _nodes = Array.isArray(this._nodes)
       ? this._nodes
       : this._links.reduce((all, d) => {
-        if (!all.includes(d.source)) all.push(d.source);
-        if (!all.includes(d.target)) all.push(d.target);
+        if (!all.includes(d.source)) all.push(d[this._linksSource]);
+        if (!all.includes(d.target)) all.push(d[this._linksTarget]);
         return all;
       }, []).map(id => ({id}));
 
@@ -137,14 +140,14 @@ export default class Sankey extends Viz {
     }, {});
 
     const links = this._links.map((link, i) => {
-      const check = ["source", "target"];
+      const check = [this._linksSource, this._linksTarget];
       const linkLookup = check.reduce((result, item) => {
         result[item] = nodeLookup[link[item]];
         return result;
       }, {});
       return {
-        source: linkLookup.source,
-        target: linkLookup.target,
+        source: linkLookup[this._linksSource],
+        target: linkLookup[this._linksTarget],
         value: this._value(link, i)
       };
     });
@@ -238,6 +241,30 @@ The value passed should be an *Array* of data. An optional formatting function c
       return this;
     }
     return this._links;
+  }
+
+  /**
+      @memberof Sankey
+      @desc Sets the source's node name.
+      @param {Function|String} [*value* = "source"]
+      @chainable
+  */
+  linksSource(_) {
+    return arguments.length
+      ? (this._linksSource = typeof _ === "function" ? _ : accessor(_), this)
+      : this._linksSource;
+  }
+
+  /**
+      @memberof Sankey
+      @desc Sets the target's node name.
+      @param {Function|String} [*value* = "target"]
+      @chainable
+  */
+  linksTarget(_) {
+    return arguments.length
+      ? (this._linksTarget = typeof _ === "function" ? _ : accessor(_), this)
+      : this._linksTarget;
   }
 
   /**
