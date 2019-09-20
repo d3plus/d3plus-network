@@ -244,7 +244,7 @@ The value passed should be an *Array* of data. An optional formatting function c
 
   /**
       @memberof Sankey
-      @desc Sets the source's node name.
+      @desc The key inside of each link Object that references the source node.
       @param {String} [*value* = "source"]
       @chainable
   */
@@ -254,7 +254,7 @@ The value passed should be an *Array* of data. An optional formatting function c
 
   /**
       @memberof Sankey
-      @desc Sets the target's node name.
+      @desc The key inside of each link Object that references the target node.
       @param {String} [*value* = "target"]
       @chainable
   */
