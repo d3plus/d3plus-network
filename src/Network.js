@@ -219,12 +219,11 @@ export default class Network extends Viz {
     }, {});
 
     let nodes = this._nodes.reduce((obj, d, i) => {
-      obj[this._nodeGroupBy ? this._nodeGroupBy[this._drawDepth](d, i) : this._id(d, i)] = d;
+      obj[this._nodeGroupBy ? this._nodeGroupBy[this._drawDepth](d, i) : d.id] = d;
       return obj;
     }, {});
 
     nodes = Array.from(new Set(Object.keys(data).concat(Object.keys(nodes)))).map((id, i) => {
-
       const d = data[id],
             n = nodes[id];
 
