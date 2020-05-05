@@ -25,7 +25,7 @@
   "dependencies": {
     "d3-array": "^1.2.4",
     "d3-force": "^1.2.1",
-    "d3-sankey": "^0.7.1",
+    "d3-sankey": "^0.11.0",
     "d3-scale": "^2.2.2",
     "d3plus-common": "^0.6.60",
     "d3plus-shape": "^0.16.14",
