@@ -71,6 +71,11 @@ export default class Rings extends Viz {
     };
     this._on["click.shape"] = d => {
       this._center = d.id;
+      // Need to resets margins and padding because we are
+      // skipping over the default render method and using
+      // _draw directly.
+      this._margin = {bottom: 0, left: 0, right: 0, top: 0};
+      this._padding = {bottom: 0, left: 0, right: 0, top: 0};
       this._draw();
     };
     this._sizeMin = 5;
