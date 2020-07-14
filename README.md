@@ -9,7 +9,7 @@ Javascript network visualizations built upon d3 modules.
 If you use NPM, run `npm install d3plus-network --save`. Otherwise, download the [latest release](https://github.com/d3plus/d3plus-network/releases/latest). The released bundle supports AMD, CommonJS, and vanilla environments. You can also load directly from [d3plus.org](https://d3plus.org):
 
 ```html
-<script src="https://d3plus.org/js/d3plus-network.v0.5.full.min.js"></script>
+<script src="https://d3plus.org/js/d3plus-network.v0.6.full.min.js"></script>
 ```
 
 
@@ -501,4 +501,4 @@ function value(d) {
 
 
 
-###### <sub>Documentation generated on Tue, 05 May 2020 17:29:04 GMT</sub>
+###### <sub>Documentation generated on Tue, 14 Jul 2020 21:54:49 GMT</sub>
