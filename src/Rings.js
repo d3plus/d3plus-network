@@ -568,8 +568,8 @@ The value passed should either be an *Array* of data or a *String* representing 
       if (typeof k === "function") return k;
       else {
         if (!this._aggs[k]) {
-          this._aggs[k] = a => {
-            const v = Array.from(new Set(a));
+          this._aggs[k] = (a, c) => {
+            const v = Array.from(new Set(a.map(c)));
             return v.length === 1 ? v[0] : v;
           };
         }

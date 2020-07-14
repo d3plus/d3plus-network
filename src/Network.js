@@ -543,8 +543,8 @@ The value passed should either be an *Array* of data or a *String* representing 
       if (typeof k === "function") return k;
       else {
         if (!this._aggs[k]) {
-          this._aggs[k] = a => {
-            const v = Array.from(new Set(a));
+          this._aggs[k] = (a, c) => {
+            const v = Array.from(new Set(a.map(c)));
             return v.length === 1 ? v[0] : v;
           };
         }
@@ -624,7 +624,7 @@ Additionally, a custom formatting function can be passed as a second argument to
       if (typeof _ === "function") this._x = _;
       else {
         this._x = accessor(_);
-        if (!this._aggs[_]) this._aggs[_] = a => mean(a);
+        if (!this._aggs[_]) this._aggs[_] = mean;
       }
       return this;
     }
@@ -642,7 +642,7 @@ Additionally, a custom formatting function can be passed as a second argument to
       if (typeof _ === "function") this._y = _;
       else {
         this._y = accessor(_);
-        if (!this._aggs[_]) this._aggs[_] = a => mean(a);
+        if (!this._aggs[_]) this._aggs[_] = mean;
       }
       return this;
     }
