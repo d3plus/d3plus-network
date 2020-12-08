@@ -151,7 +151,7 @@ export default class Network extends Viz {
     this._on["mousemove.shape"] = (d, i) => {
       defaultMouseMove(d, i);
       const id = `${this._nodeGroupBy && this._nodeGroupBy[this._drawDepth](d, i) ? this._nodeGroupBy[this._drawDepth](d, i) : this._id(d, i)}`,
-            links = this._linkLookup[id],
+            links = this._linkLookup[id] || [],
             node = this._nodeLookup[id];
 
       const filterIds = [id];
