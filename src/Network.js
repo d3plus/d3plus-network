@@ -302,8 +302,18 @@ export default class Network extends Viz {
       simulation.nodes(nodes);
       simulation.tick(iterations).stop();
 
-      const hull = polygonHull(nodes.map(n => [n.vx, n.vy]));
-      const {angle, cx, cy} = shapes.largestRect(hull);
+      const nodePositions = nodes.map(n => [n.vx, n.vy]);
+      let angle = 0, cx = 0, cy = 0;
+      if (nodePositions.length === 2) {
+        angle = 100;
+      }
+      else if (nodePositions.length > 2) {
+        const hull = polygonHull(nodePositions);
+        const rect = shapes.largestRect(hull, {verbose: true});
+        angle = rect.angle;
+        cx = rect.cx;
+        cy = rect.cy;
+      }
 
       nodes.forEach(n => {
         const p = shapes.pointRotate([n.vx, n.vy], -1 * (Math.PI / 180 * angle), [cx, cy]);
@@ -319,7 +329,7 @@ export default class Network extends Viz {
     const x = scales.scaleLinear().domain(xExtent).range([0, width]),
           y = scales.scaleLinear().domain(yExtent).range([0, height]);
 
-    const nodeRatio = (xExtent[1] - xExtent[0]) / (yExtent[1] - yExtent[0]),
+    const nodeRatio = (xExtent[1] - xExtent[0]) / (yExtent[1] - yExtent[0]) || 1,
           screenRatio = width / height;
 
     if (nodeRatio > screenRatio) {
@@ -369,12 +379,13 @@ export default class Network extends Viz {
     x.domain(xDomain);
     y.domain(yDomain);
 
+    const fallbackRadius = (nodeRatio > screenRatio ? width : height) / 2;
     nodes.forEach(n => {
       n.x = x(n.fx);
       n.fx = n.x;
       n.y = y(n.fy);
       n.fy = n.y;
-      n.r = r(n.r);
+      n.r = r(n.r) || fallbackRadius;
       n.width = n.r * 2;
       n.height = n.r * 2;
     });
