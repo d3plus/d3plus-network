@@ -233,8 +233,8 @@ export default class Network extends Viz {
         __d3plus__: true,
         data: d || n,
         i, id,
-        fx: d !== undefined && this._x(d) !== undefined ? this._x(d) : this._x(n),
-        fy: d !== undefined && this._y(d) !== undefined ? this._y(d) : this._y(n),
+        fx: d !== undefined && !isNaN(this._x(d)) ? this._x(d) : this._x(n),
+        fy: d !== undefined && !isNaN(this._y(d)) ? this._y(d) : this._y(n),
         node: n,
         r: this._size ? d !== undefined && this._size(d) !== undefined ? this._size(d) : this._size(n) : this._sizeMin,
         shape: d !== undefined && this._shape(d) !== undefined ? this._shape(d) : this._shape(n)
