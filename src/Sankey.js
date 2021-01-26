@@ -22,7 +22,7 @@ const sankeyAligns = {
 import {accessor, assign, configPrep, constant, elem} from "d3plus-common";
 import {Path} from "d3plus-shape";
 import * as shapes from "d3plus-shape";
-import {dataLoad as load, Viz} from "d3plus-viz";
+import {addToQueue, Viz} from "d3plus-viz";
 
 /**
     @class Sankey
@@ -233,10 +233,7 @@ The value passed should be an *Array* of data. An optional formatting function c
   */
   links(_, f) {
     if (arguments.length) {
-      const prev = this._queue.find(q => q[3] === "links");
-      const d = [load.bind(this), _, f, "links"];
-      if (prev) this._queue[this._queue.indexOf(prev)] = d;
-      else this._queue.push(d);
+      addToQueue.bind(this)(_, f, "links");
       return this;
     }
     return this._links;
@@ -296,10 +293,7 @@ Additionally, a custom formatting function can be passed as a second argument to
   */
   nodes(_, f) {
     if (arguments.length) {
-      const prev = this._queue.find(q => q[3] === "nodes");
-      const d = [load.bind(this), _, f, "nodes"];
-      if (prev) this._queue[this._queue.indexOf(prev)] = d;
-      else this._queue.push(d);
+      addToQueue.bind(this)(_, f, "nodes");
       return this;
     }
     return this._nodes;
