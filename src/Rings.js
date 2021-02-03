@@ -173,8 +173,8 @@ export default class Rings extends Viz {
       return map;
     }, {});
 
-    const height = this._height - this._margin.top - this._margin.bottom,
-          duration = this._duration,
+    const duration = this._duration,
+          height = this._height - this._margin.top - this._margin.bottom,
           transform = `translate(${this._margin.left}, ${this._margin.top})`,
           width = this._width - this._margin.left - this._margin.right;
 
