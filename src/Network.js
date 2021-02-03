@@ -35,7 +35,7 @@ export default class Network extends Viz {
     this._linkSizeScale = "sqrt";
     this._noDataMessage = false;
     this._nodes = [];
-    this._on["click.shape"] = (d, i) => {
+    this._on["click.shape"] = (d, i, x, event) => {
 
       this._tooltipClass.data([]).render();
 
@@ -46,7 +46,7 @@ export default class Network extends Viz {
         if (this._focus && this._focus === id) {
 
           this.active(false);
-          this._on.mouseenter.bind(this)(d, i);
+          this._on.mouseenter.bind(this)(d, i, x, event);
 
           this._focus = undefined;
           this._zoomToBounds(null);
@@ -87,7 +87,7 @@ export default class Network extends Viz {
       }
 
     };
-    this._on["click.legend"] = (d, i) => {
+    this._on["click.legend"] = (d, i, x, event) => {
 
       const ids = this._id(d);
       let id = this._ids(d);
@@ -137,8 +137,8 @@ export default class Network extends Viz {
 
         }
 
-        this._on.mouseenter.bind(this)(d, i);
-        this._on["mousemove.legend"].bind(this)(d, i);
+        this._on.mouseenter.bind(this)(d, i, x, event);
+        this._on["mousemove.legend"].bind(this)(d, i, x, event);
 
       }
 
@@ -148,8 +148,8 @@ export default class Network extends Viz {
       this.hover(false);
     };
     const defaultMouseMove = this._on["mousemove.shape"];
-    this._on["mousemove.shape"] = (d, i) => {
-      defaultMouseMove(d, i);
+    this._on["mousemove.shape"] = (d, i, x, event) => {
+      defaultMouseMove(d, i, x, event);
       const id = `${this._nodeGroupBy && this._nodeGroupBy[this._drawDepth](d, i) ? this._nodeGroupBy[this._drawDepth](d, i) : this._id(d, i)}`,
             links = this._linkLookup[id] || [],
             node = this._nodeLookup[id];
