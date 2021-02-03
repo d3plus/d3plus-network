@@ -174,8 +174,8 @@ export default class Rings extends Viz {
     }, {});
 
     const height = this._height - this._margin.top - this._margin.bottom,
+          duration = this._duration,
           transform = `translate(${this._margin.left}, ${this._margin.top})`,
-          transition = this._transition,
           width = this._width - this._margin.left - this._margin.right;
 
     const edges = [],
@@ -446,7 +446,7 @@ export default class Rings extends Viz {
       .id(d => `${d.source.id}_${d.target.id}`)
       .d(d => d.spline ? `M${d.sourceX},${d.sourceY}C${d.sourceBisectX},${d.sourceBisectY} ${d.targetBisectX},${d.targetBisectY} ${d.targetX},${d.targetY}` : `M${d.source.x},${d.source.y} ${d.target.x},${d.target.y}`)
       .data(edges)
-      .select(elem("g.d3plus-rings-links", {parent: this._select, transition, enter: {transform}, update: {transform}}).node())
+      .select(elem("g.d3plus-rings-links", {parent: this._select, duration, enter: {transform}, update: {transform}}).node())
       .render());
 
     const that = this;
@@ -462,7 +462,7 @@ export default class Rings extends Viz {
         verticalAlign: d => d.id === this._center ? "middle" : "top"
       },
       rotate: d => nodeLookup[d.id].rotate || 0,
-      select: elem("g.d3plus-rings-nodes", {parent: this._select, transition, enter: {transform}, update: {transform}}).node()
+      select: elem("g.d3plus-rings-nodes", {parent: this._select, duration, enter: {transform}, update: {transform}}).node()
     };
 
     nest().key(d => d.shape).entries(nodes).forEach(d => {

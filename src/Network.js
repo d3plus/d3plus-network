@@ -208,9 +208,9 @@ export default class Network extends Viz {
 
     super._draw(callback);
 
-    const height = this._height - this._margin.top - this._margin.bottom,
+    const duration = this._duration,
+          height = this._height - this._margin.top - this._margin.bottom,
           transform = `translate(${this._margin.left}, ${this._margin.top})`,
-          transition = this._transition,
           width = this._width - this._margin.left - this._margin.right;
 
     const data = this._filteredData.reduce((obj, d, i) => {
@@ -402,7 +402,7 @@ export default class Network extends Viz {
         .style("background-color", "transparent")
       .merge(this._container);
 
-    this._container.transition(this._transition)
+    this._container.transition().duration(duration)
       .attr("opacity", 1)
       .attr("width", width)
       .attr("height", height)
@@ -450,12 +450,12 @@ export default class Network extends Viz {
       })
       .d(d => `M${d.source.x},${d.source.y} ${d.target.x},${d.target.y}`)
       .data(links)
-      .select(elem("g.d3plus-network-links", {parent, transition, enter: {transform}, update: {transform}}).node())
+      .select(elem("g.d3plus-network-links", {parent, duration, enter: {transform}, update: {transform}}).node())
       .render());
 
     const shapeConfig = {
       label: d => nodes.length <= this._dataCutoff || (this._hover && this._hover(d) || this._active && this._active(d)) ? this._drawLabel(d.data || d.node, d.i) : false,
-      select: elem("g.d3plus-network-nodes", {parent, transition, enter: {transform}, update: {transform}}).node()
+      select: elem("g.d3plus-network-nodes", {parent, duration, enter: {transform}, update: {transform}}).node()
     };
 
     nest().key(d => d.shape).entries(nodes).forEach(d => {
