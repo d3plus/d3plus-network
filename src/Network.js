@@ -291,7 +291,7 @@ export default class Network extends Viz {
         .force("charge", forceManyBody().strength(-1))
         .stop();
 
-      const iterations = 300;
+      const iterations = 100;
       const alphaMin = 0.001;
       const alphaDecay = 1 - Math.pow(alphaMin, 1 / iterations);
       simulation.velocityDecay(0);
