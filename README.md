@@ -1,15 +1,18 @@
 # d3plus-network
 
-[![NPM Release](http://img.shields.io/npm/v/d3plus-network.svg?style=flat)](https://www.npmjs.org/package/d3plus-network) [![Build Status](https://travis-ci.org/d3plus/d3plus-network.svg?branch=master)](https://travis-ci.org/d3plus/d3plus-network) [![Dependency Status](http://img.shields.io/david/d3plus/d3plus-network.svg?style=flat)](https://david-dm.org/d3plus/d3plus-network) [![Gitter](https://img.shields.io/badge/-chat_on_gitter-brightgreen.svg?style=flat&logo=gitter-white)](https://gitter.im/d3plus/) [![1.0 progress](https://img.shields.io/badge/1.0_progress-57%25-yellow.svg?style=flat)](https://github.com/d3plus/d3plus-network/projects/1)
+[![NPM Release](http://img.shields.io/npm/v/d3plus-network.svg?style=flat)](https://www.npmjs.org/package/d3plus-network) [![Build Status](https://travis-ci.org/d3plus/d3plus-network.svg?branch=master)](https://travis-ci.org/d3plus/d3plus-network) [![Dependency Status](http://img.shields.io/david/d3plus/d3plus-network.svg?style=flat)](https://david-dm.org/d3plus/d3plus-network) [![Gitter](https://img.shields.io/badge/-chat_on_gitter-brightgreen.svg?style=flat&logo=gitter-white)](https://gitter.im/d3plus/)
 
 Javascript network visualizations built upon d3 modules.
 
 ## Installing
 
-If you use NPM, run `npm install d3plus-network --save`. Otherwise, download the [latest release](https://github.com/d3plus/d3plus-network/releases/latest). The released bundle supports AMD, CommonJS, and vanilla environments. You can also load directly from [d3plus.org](https://d3plus.org):
+If you use NPM, `npm install d3plus-network`. Otherwise, download the [latest release](https://github.com/d3plus/d3plus-network/releases/latest). You can also load d3plus-network as a standalone library or as part of [D3plus](https://github.com/d3plus/d3plus). ES modules, AMD, CommonJS, and vanilla environments are supported. In vanilla, a `d3plus` global is exported:
 
 ```html
-<script src="https://d3plus.org/js/d3plus-network.v0.6.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/d3plus-network@1"></script>
+<script>
+  console.log(d3plus);
+</script>
 ```
 
 
@@ -501,4 +504,4 @@ function value(d) {
 
 
 
-###### <sub>Documentation generated on Tue, 26 Jan 2021 15:23:48 GMT</sub>
+###### <sub>Documentation generated on Wed, 03 Feb 2021 00:42:12 GMT</sub>
