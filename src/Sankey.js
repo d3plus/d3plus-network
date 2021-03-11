@@ -23,6 +23,8 @@ import {accessor, assign, configPrep, constant, elem} from "d3plus-common";
 import {Path} from "d3plus-shape";
 import * as shapes from "d3plus-shape";
 import {addToQueue, Viz} from "d3plus-viz";
+import {extent, group, max, sum} from "d3-array";
+import * as scales from "d3-scale";
 
 /**
     @class Sankey
@@ -168,6 +170,47 @@ export default class Sankey extends Viz {
       .nodes(nodes)
       .links(links)
       .size([width, height])();
+
+    console.log(nodes, links);
+    const heightDomain = extent(nodes, d => d.y1 - d.y0);
+    console.log(heightDomain);
+
+    const heightScale = scales.scaleLog()
+      .domain(heightDomain)
+      .range(heightDomain);
+
+    nodes.forEach(d => {
+      const oldHeight = d.y1 - d.y0;
+      const newHeight = heightScale(oldHeight);
+      const heightChange = newHeight - oldHeight;
+      const neighborNodes = nodes.filter(n => n.layer === d.layer && n.y0 > d.y1);
+      d.y1 = d.y0 + newHeight;
+      // go into sourceLinks and targetLinks and adjust heights
+      neighborNodes.forEach(n => {
+        n.y0 += heightChange;
+        n.y1 += heightChange;
+      });
+    });
+
+    const groupedLevels = Array.from(group(nodes, d => d.layer), d => d[1]);
+    const maxHeight = max(groupedLevels, arr => sum(arr, d => d.y1 - d.y0) + this._nodePadding * arr.length - 1);
+    console.log(this._height, maxHeight);
+    const screenScale = scales.scaleLinear()
+      .domain([0, maxHeight])
+      .range([0, height]);
+
+    nodes.forEach(d => {
+      const oldHeight = d.y1 - d.y0;
+      const newHeight = screenScale(oldHeight);
+      const heightChange = newHeight - oldHeight;
+      const neighborNodes = nodes.filter(n => n.layer === d.layer && n.y0 > d.y1);
+      d.y1 = d.y0 + newHeight;
+      // go into sourceLinks and targetLinks and adjust heights
+      neighborNodes.forEach(n => {
+        n.y0 += heightChange;
+        n.y1 += heightChange;
+      });
+    });
 
     this._shapes.push(
       new Path()
