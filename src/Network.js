@@ -34,6 +34,7 @@ export default class Network extends Viz {
     this._linkSizeMin = 1;
     this._linkSizeScale = "sqrt";
     this._noDataMessage = false;
+    this._nodeGroupBy = [accessor("id")];
     this._nodes = [];
     this._on["click.shape"] = (d, i, x, event) => {
 
@@ -41,7 +42,7 @@ export default class Network extends Viz {
 
       if (this._hover && this._drawDepth >= this._groupBy.length - 1) {
 
-        const id = `${this._nodeGroupBy && this._nodeGroupBy[this._drawDepth](d, i) ? this._nodeGroupBy[this._drawDepth](d, i) : this._id(d, i)}`;
+        const id = `${this._id(d, i) || this._nodeGroupBy[this._drawDepth](d, i)}`;
 
         if (this._focus && this._focus === id) {
 
@@ -73,7 +74,7 @@ export default class Network extends Viz {
 
           this.active((h, x) => {
             if (h.source && h.target) return h.source.id === id || h.target.id === id;
-            else return filterIds.includes(`${this._ids(h, x)[this._drawDepth]}`);
+            else return filterIds.includes(`${this._id(h, x) || this._nodeGroupBy[this._drawDepth](h, x)}`);
           });
 
           this._focus = id;
@@ -219,7 +220,7 @@ export default class Network extends Viz {
     }, {});
 
     let nodes = this._nodes.reduce((obj, d, i) => {
-      obj[this._nodeGroupBy ? this._nodeGroupBy[this._drawDepth](d, i) : d.id] = d;
+      obj[this._nodeGroupBy[this._drawDepth](d, i)] = d;
       return obj;
     }, {});
 
@@ -541,7 +542,7 @@ The value passed should either be an *Array* of data or a *String* representing 
   /**
       @memberof Network
       @desc If *value* is specified, sets the node group accessor(s) to the specified string, function, or array of values and returns the current class instance. This method overrides the default .groupBy() function from being used with the data passed to .nodes(). If *value* is not specified, returns the current node group accessor.
-      @param {String|Function|Array} [*value* = undefined]
+      @param {String|Function|Array} [*value* = "id"]
       @chainable
   */
   nodeGroupBy(_) {
