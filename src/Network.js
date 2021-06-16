@@ -15,6 +15,14 @@ import * as shapes from "d3plus-shape";
 import {addToQueue, Viz} from "d3plus-viz";
 
 /**
+ * Fetches the unique ID for a data point, whether it's defined by data or nodes.
+ * @private
+ */
+function getNodeId(d, i) {
+  return `${this._id(d, i) || this._nodeGroupBy[min([this._drawDepth, this._nodeGroupBy.length - 1])](d, i)}`;
+}
+
+/**
     @class Network
     @extends external:Viz
     @desc Creates a network visualization based on a defined set of nodes and edges. [Click here](http://d3plus.org/examples/d3plus-network/getting-started/) for help getting started using the Network class.
@@ -42,7 +50,7 @@ export default class Network extends Viz {
 
       if (this._hover && this._drawDepth >= this._groupBy.length - 1) {
 
-        const id = `${this._id(d, i) || this._nodeGroupBy[this._drawDepth](d, i)}`;
+        const id = getNodeId.bind(this)(d, i);
 
         if (this._focus && this._focus === id) {
 
@@ -74,7 +82,7 @@ export default class Network extends Viz {
 
           this.active((h, x) => {
             if (h.source && h.target) return h.source.id === id || h.target.id === id;
-            else return filterIds.includes(`${this._id(h, x) || this._nodeGroupBy[this._drawDepth](h, x)}`);
+            else return filterIds.includes(getNodeId.bind(this)(h, x));
           });
 
           this._focus = id;
@@ -151,7 +159,7 @@ export default class Network extends Viz {
     const defaultMouseMove = this._on["mousemove.shape"];
     this._on["mousemove.shape"] = (d, i, x, event) => {
       defaultMouseMove(d, i, x, event);
-      const id = `${this._nodeGroupBy && this._nodeGroupBy[this._drawDepth](d, i) ? this._nodeGroupBy[this._drawDepth](d, i) : this._id(d, i)}`,
+      const id = getNodeId.bind(this)(d, i),
             links = this._linkLookup[id] || [],
             node = this._nodeLookup[id];
 
@@ -220,7 +228,7 @@ export default class Network extends Viz {
     }, {});
 
     let nodes = this._nodes.reduce((obj, d, i) => {
-      obj[this._nodeGroupBy[this._drawDepth](d, i)] = d;
+      obj[getNodeId.bind(this)(d, i)] = d;
       return obj;
     }, {});
 
