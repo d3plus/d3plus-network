@@ -3,7 +3,7 @@
     @see https://github.com/d3plus/d3plus-viz#Viz
 */
 import {arc} from "d3-shape";
-import {descending} from "d3-array";
+import {descending, min} from "d3-array";
 import {chord, ribbon} from "d3-chord";
 
 import {accessor, assign, configPrep, constant, elem} from "d3plus-common";
@@ -27,21 +27,74 @@ export default class Chord extends Viz {
   constructor() {
     super();
     this._chord = chord();
+
+    this._label = (d, i) => {
+      if (d.sourceNode && d.targetNode) {
+        return `${this._nodeId(d.sourceNode)} / ${this._nodeId(d.targetNode)}`;
+      }
+      return this._nodeId(d, i);
+    };
+
     this._links = accessor("links");
+    this._linksShapeConfig = {
+      Path: {
+        fillOpacity: 0.7
+      }
+    };
     this._linksSource = "source";
     this._linksTarget = "target";
     this._noDataMessage = false;
     this._nodeId = accessor("id");
+    this._nodeWidth = 15;
     this._nodes = accessor("nodes");
-    this._innerRadius = 200;
-    this._outerRadius = 210;
+    
+    /*
+    this._on.mouseenter = () => {};
+    this._on["mouseleave.shape"] = () => {
+      this.hover(false);
+    };
+    const defaultMouseMove = this._on["mousemove.shape"];
+    this._on["mousemove.shape"] = (d, i, x, event) => {
+      defaultMouseMove(d, i, x, event);
+      if (this._focus && this._focus === d.id) {
+        this.hover(false);
+        this._on.mouseenter.bind(this)(d, i, x, event);
+
+        this._focus = undefined;
+      }
+      else {
+        const id = this._nodeId(d, i),
+              node = this._nodeLookup[id],
+              nodeLookup = Object.keys(this._nodeLookup).reduce((all, item) => {
+                all[this._nodeLookup[item]] = !isNaN(item) ? parseInt(item, 10) : item;
+                return all;
+              }, {});
+
+        const links = this._linkLookup[node] || [];
+        const filterIds = [id];
+
+        links.forEach(l => {
+          filterIds.push(nodeLookup[l]);
+        });
+
+        const _filtersIds = [...new Set(filterIds)];
+
+        this.hover((h, x) => {
+          if (h.source && h.target) {
+            return h.source.index === node || h.target.index === node;
+          }
+          else {
+            return _filtersIds.includes(this._nodeId(h, x));
+          }
+        });
+      }
+    };*/
     this._padAngle = 0.05;
-    this._radius = 200;
     this._shapeConfig = assign(this._shapeConfig, {
       Path: {
         label: false,
         strokeOpacity: 0.5,
-        strokeWidth: 0.5
+        strokeWidth: 1
       }
     });
     this._sortSubgroups = descending();
@@ -60,26 +113,34 @@ export default class Chord extends Viz {
     const height = this._height - this._margin.top - this._margin.bottom,
           width = this._width - this._margin.left - this._margin.right;
 
+    const innerRadius = min([
+      this._width - this._margin.left - this._margin.right - 2 * this._nodeWidth,
+      this._height - this._margin.top - this._margin.bottom - 2 * this._nodeWidth
+    ]) / 2;
+
+    const outerRadius = innerRadius + this._nodeWidth;
+
     const data = this._filteredData.reduce((obj, d, i) => {
-      obj[this._id(d, i)] = d;
+      obj[this._nodeId(d, i)] = d;
       return obj;
     }, {});
 
     const _nodes = Array.isArray(this._nodes)
-      ? this._nodes.reduce((obj, d, i) => {
-        obj[this._id(d, i)] = d;
+      ? this._nodes.sort((a, b) => this._nodeId(a) > this._nodeId(b) ? 1 : -1).reduce((obj, d, i) => {
+        obj[this._nodeId(d, i)] = d;
         return obj;
       }, {})
       : this._links.reduce((all, d) => {
         if (!all.includes(d[this._linksSource])) all.push(d[this._linksSource]);
         if (!all.includes(d[this._linksTarget])) all.push(d[this._linksTarget]);
         return all;
-      }, []).map(id => ({id})).reduce((obj, d, i) => {
-        obj[this._id(d, i)] = d;
+      }, []).map(id => ({[this._linksSource]: id})).reduce((obj, d, i) => {
+        obj[this._nodeId(d, i)] = d;
         return obj;
       }, {});
 
     const nodes = Array.from(new Set(Object.keys(data).concat(_nodes))).map((id, i) => {
+
       const d = data[id],
             n = _nodes[id];
 
@@ -112,6 +173,14 @@ export default class Chord extends Viz {
       };
     });
 
+    this._linkLookup = links.reduce((obj, d) => {
+      if (!obj[d.source]) obj[d.source] = [];
+      obj[d.source].push(d.target);
+      if (!obj[d.target]) obj[d.target] = [];
+      obj[d.target].push(d.source);
+      return obj;
+    }, {});
+
     const matrix = Array(nodes.length).fill().map(() => Array(nodes.length).fill(0));
 
     links.map(link => matrix[link.source][link.target] = link.value);
@@ -121,12 +190,29 @@ export default class Chord extends Viz {
       .sortSubgroups(this._sortSubgroups)
       (matrix);
 
+    _chord.forEach(link => {
+      if (link.source && link.target) {
+        const _sourceData = Array.isArray(this._nodes) ? this._nodes[link.source.index] : nodes[link.source.index].node;
+        const _targetData = Array.isArray(this._nodes) ? this._nodes[link.target.index] : nodes[link.target.index].node;
+
+        link.__d3plus__ = true;
+        link.data = {
+          [this._linksSource]: this._nodeId(_sourceData),
+          [this._linksTarget]: this._nodeId(_targetData),
+          sourceNode: _sourceData,
+          targetNode: _targetData,
+          value: link.source.value
+        };
+        link.i = `${link.source.index}-${link.target.index}`;
+      }
+    });
+    
     const arcData = arc()
-      .innerRadius(this._innerRadius)
-      .outerRadius(this._outerRadius);
+      .innerRadius(innerRadius)
+      .outerRadius(outerRadius);
 
     const radiusData = ribbon()
-      .radius(this._radius);
+      .radius(innerRadius);
 
     const transform = `translate(${width / 2 + this._margin.left}, ${height / 2 + this._margin.top})`;
 
@@ -148,10 +234,10 @@ export default class Chord extends Viz {
 
     this._shapes.push(
       new Path()
-        .config(configPrep.bind(this)(this._shapeConfig, "shape", "Path"))
+        .config(configPrep.bind(this)(assign(this._shapeConfig, this._linksShapeConfig), "shape", "Path"))
         .d(radiusData)
         .data(_chord)
-        .id(d => `${d.source.index}_${d.target.index}`) 
+        .id(d => `${d.source.index}-${d.target.index}`)
         .select(
           elem("g.d3plus-chord-links", {
             parent: this._select,
@@ -180,6 +266,16 @@ The value passed should be an *Array* of data. An optional formatting function c
       return this;
     }
     return this._links;
+  }
+
+  /**
+      @memberof Chord
+      @desc If *value* is specified, sets the config method for each link and returns the current class instance.
+      @param {Object} [*value*]
+      @chainable
+  */
+  linksShapeConfig(_) {
+    return arguments.length ? (this._linksShapeConfig = assign(this._linksShapeConfig, _), this) : this._linksShapeConfig;
   }
     
   /**
