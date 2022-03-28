@@ -199,13 +199,13 @@ export default class Chord extends Viz {
 
     links.map(link => matrix[link.source][link.target] = link.value);
 
-    const _chord = this._chord
+    const chordData = this._chordData = this._chord
       .padAngle(this._padAngle)
       .sortGroups(this._sortGroups)
       .sortSubgroups(this._sortSubgroups)
       (matrix);
 
-    _chord.forEach(link => {
+    chordData.forEach(link => {
       if (link.source && link.target) {
         const _sourceData = Array.isArray(this._nodes) ? this._nodes[link.source.index] : nodes[link.source.index].node;
         const _targetData = Array.isArray(this._nodes) ? this._nodes[link.target.index] : nodes[link.target.index].node;
@@ -235,7 +235,7 @@ export default class Chord extends Viz {
       new Path()
         .config(configPrep.bind(this)(this._shapeConfig, "shape", "Path"))
         .d(arcData)
-        .data(_chord.groups.map(d => Object.assign(d, nodes[d.index])))
+        .data(chordData.groups.map(d => Object.assign(d, nodes[d.index])))
         .id(d => d.index)
         .select(
           elem("g.d3plus-chord-nodes", {
@@ -251,7 +251,7 @@ export default class Chord extends Viz {
       new Path()
         .config(configPrep.bind(this)(assign(this._shapeConfig, this._linksShapeConfig), "shape", "Path"))
         .d(radiusData)
-        .data(_chord)
+        .data(chordData)
         .id(d => `${d.source.index}-${d.target.index}`)
         .select(
           elem("g.d3plus-chord-links", {
