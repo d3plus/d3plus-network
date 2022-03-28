@@ -2,9 +2,9 @@
     @external Viz
     @see https://github.com/d3plus/d3plus-viz#Viz
 */
-import {arc} from "d3-shape";
 import {descending, min} from "d3-array";
 import {chord, ribbon} from "d3-chord";
+import {arc} from "d3-shape";
 
 import {accessor, assign, configPrep, constant, elem} from "d3plus-common";
 import {Path} from "d3plus-shape";
@@ -48,12 +48,35 @@ export default class Chord extends Viz {
     this._nodeWidth = 15;
     this._nodes = accessor("nodes");
     
-    /*
     this._on.mouseenter = () => {};
     this._on["mouseleave.shape"] = () => {
       this.hover(false);
     };
     const defaultMouseMove = this._on["mousemove.shape"];
+    this._on["mousemove.legend"] = (d, i, x, event) => {
+      defaultMouseMove(d, i, x, event);
+      if (this._focus && this._focus === d.id) {
+        this.hover(false);
+        this._on.mouseenter.bind(this)(d, i, x, event);
+
+        this._focus = undefined;
+      }
+      else {
+        const id = this._nodeId(d, i),
+              node = this._nodeLookup[id];
+
+        const _filtersIds = [id];
+
+        this.hover((h, x) => {
+          if (h.source) {
+            return h.source.index === node;
+          }
+          else {
+            return _filtersIds.includes(this._nodeId(h, x));
+          }
+        });
+      }
+    };
     this._on["mousemove.shape"] = (d, i, x, event) => {
       defaultMouseMove(d, i, x, event);
       if (this._focus && this._focus === d.id) {
@@ -64,31 +87,21 @@ export default class Chord extends Viz {
       }
       else {
         const id = this._nodeId(d, i),
-              node = this._nodeLookup[id],
-              nodeLookup = Object.keys(this._nodeLookup).reduce((all, item) => {
-                all[this._nodeLookup[item]] = !isNaN(item) ? parseInt(item, 10) : item;
-                return all;
-              }, {});
+              node = this._nodeLookup[id];
 
-        const links = this._linkLookup[node] || [];
-        const filterIds = [id];
-
-        links.forEach(l => {
-          filterIds.push(nodeLookup[l]);
-        });
-
-        const _filtersIds = [...new Set(filterIds)];
+        const _filtersIds = [id];
 
         this.hover((h, x) => {
-          if (h.source && h.target) {
-            return h.source.index === node || h.target.index === node;
+          if (h.source) {
+            return h.source.index === node;
           }
           else {
             return _filtersIds.includes(this._nodeId(h, x));
           }
         });
       }
-    };*/
+    };
+
     this._padAngle = 0.05;
     this._shapeConfig = assign(this._shapeConfig, {
       Path: {
@@ -97,7 +110,8 @@ export default class Chord extends Viz {
         strokeWidth: 1
       }
     });
-    this._sortSubgroups = descending();
+    this._sortGroups = descending;
+    this._sortSubgroups = descending;
     this._value = constant(1);
   }
 
@@ -187,6 +201,7 @@ export default class Chord extends Viz {
 
     const _chord = this._chord
       .padAngle(this._padAngle)
+      .sortGroups(this._sortGroups)
       .sortSubgroups(this._sortSubgroups)
       (matrix);
 
@@ -326,6 +341,36 @@ Additionally, a custom formatting function can be passed as a second argument to
     return this._nodes;
   }
 
+  /**
+   * @memberof Chord
+   * @desc If *value* is specified, sets the pad angle accessor to the specified function and returns this ribbon generator.
+   * @param {Number} *value*
+   * @chainable
+   */
+  padAngle(_) {
+    return arguments.length ? (this._padAngle = _, this) : this._padAngle;
+  }
+
+  /**
+      @memberof Chord
+      @desc If *value* is specified, sets the group comparator to the specified function or null and returns this chord layout. If *value* is not specified, returns the current group comparator, which defaults to d3.descending().
+      @param {Function} *value* 
+      @chainable
+   */
+  sortGroups(_) {
+    arguments.length ? (this._sortGroups = _, this) : this._sortGroups;
+  }
+
+  /**
+      @memberof Chord
+      @desc If *value* is specified, sets the subgroup comparator to the specified function or null and returns this chord layout. If *value* is not specified, returns the current subgroup comparator, which defaults to d3.descending().
+      @param {Function} *value*
+      @chainable
+   */
+  sortSubgroups(_) {
+    arguments.length ? (this._sortSubgroups = _, this) : this._sortSubgroups;
+  }
+  
   /**
       @memberof Chord
       @desc If *value* is specified, sets the width of the links and returns the current class instance. If *value* is not specified, returns the current value accessor.
