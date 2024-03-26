@@ -27,9 +27,9 @@
     "d3-force": "^2.1.1",
     "d3-sankey": "^0.12.3",
     "d3-scale": "^3.2.3",
-    "d3plus-common": "^1.0.4",
-    "d3plus-shape": "^1.0.3",
-    "d3plus-viz": "^1.0.9"
+    "d3plus-common": "~1.1.2",
+    "d3plus-shape": "~1.0.11",
+    "d3plus-viz": "~1.0.11"
   },
   "scripts": {
     "build": "d3plus-build",
@@ -41,7 +41,7 @@
     "test": "d3plus-test"
   },
   "devDependencies": {
-    "d3plus-dev": "^1.0.1"
+    "d3plus-dev": "~1.1.0"
   },
   "module": "es/index",
   "sideEffects": false,
